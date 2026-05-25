@@ -160,7 +160,10 @@ document.getElementById("loginButton").addEventListener("click", () => {
         age,
         idNumber,
         MMSE,
-        gender
+        gender,
+        easyScore,
+        mediumScore,
+        hardScore
     });
 
     /*前端送資料*/
@@ -281,7 +284,9 @@ const result = document.getElementById("result");
 const overlayContainer = document.getElementById("overlayContainer");
 let difficulty = "easy";
 let current = 0;
-let score = 0;
+let easyScore = 0;
+let mediumScore = 0;
+let hardScore = 0;
 let currentQuestions = [];
 let timer = null;
 let timeLimit = 0;
@@ -575,4 +580,8 @@ function showResult() {
 
     document.getElementById("playerScore").textContent =
         `你的分數：${score} / ${currentQuestions.length}`;
+    
+    if (difficulty === "easy") easyScore = score;
+    if (difficulty === "medium") mediumScore = score;
+    if (difficulty === "hard") hardScore = score;
 }
