@@ -1,0 +1,257 @@
+html, body{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    overflow: hidden;
+}
+
+.app{
+    width: 100%;
+    height: 100vh;
+    position: relative;
+}
+
+/*遊戲名稱*/
+#projectName{
+    text-align: center;
+    font-size: 60px;
+    margin-bottom: 0px;
+}
+
+/*遊戲按鈕*/
+.btn{
+    width: 250px;
+    height: 60px;
+    font-size: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/*基本資料區*/
+
+.screen{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    top: 0;
+    left: 0;
+    padding-top: 15px;
+    gap: 5px;
+    overflow-y: auto;
+}
+
+.login{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.loginTitle{
+    font-size: 40px;
+    margin-top: 0;
+    margin-bottom: 0px;
+}
+
+.field{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 70px;
+    gap: 4px;
+}
+
+.loginInputs{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 25px;
+    gap: 8px;
+}
+
+.loginInputs input, .loginInputs select{
+    width: 300px;
+    height: 45px;
+    font-size: 24px;
+    box-sizing: border-box;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+input, select{
+    border: 2px solid #ccc;
+    padding: 8px;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+input.error, select.error{
+    border-color: red;
+}
+
+.error{
+    color: red;
+    font-size: 14px;
+    min-height: 14px;
+    margin-top: 0px;
+    width: 300px;
+    text-align: left;
+}
+
+#loginButton{
+    width: 250px;
+    height: 60px;
+    font-size: 25px;
+}
+
+/*控制區*/
+.control{
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    align-items: center;
+    flex-direction: column;
+}
+
+.control button{
+    width: 250px;
+    height: 60px;
+    font-size: 25px;
+}
+
+/*指導語區*/
+.instructions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 16px;
+}
+
+#instructionText {
+    max-width: 500px;
+    line-height: 1.6;
+    font-size: 25px;
+}
+
+/*試玩、開始遊戲區*/
+#gameTitle {
+    font-size: 40px;
+    font-weight: bold;
+}
+
+#startButton, #practiceButton{
+    width: 250px;
+    height: 60px;
+    font-size: 25px;
+    margin-top: 10px;
+}
+
+.hidden{
+    display: none !important;
+}
+
+.buttonGroup{
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.buttonType, .buttonLevel{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+/*答對、錯之圈圈叉叉*/
+.overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 120px;
+    font-weight: bold;
+    pointer-events: none;
+    z-index: 999;
+    animation: pop 0.4s ease;
+}
+
+.overlay.correct {
+    color: #00c853;
+}
+
+.overlay.wrong {
+    color: #ff1744;
+}
+
+@keyframes pop {
+    0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.gameArea {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.buttons {
+    display: grid;
+    gap: 12px;
+    max-width: 500px;
+    width: 100%;
+}
+
+.buttons button {
+    border: 3px solid #ccc;
+    background: white;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.buttons button:hover {
+    border-color: #4CAF50;
+}
+
+.buttons img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.selected {
+    outline: 4px solid #00c853;
+    box-shadow: 0 0 10px rgba(0, 200, 83, 0.4);
+    transform: scale(0.97);
+}
+
+/*結果區*/
+.result {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    gap: 20px;
+}
+
+#playerScore {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.result button {
+    font-size: 20px;
+    padding: 12px 24px;
+}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class = "app">
+
+        <div class="screen login">
+            <div id = "projectName">高齡者大腦體操</div>
+
+            <div class = "loginTitle">
+            <p>請輸入基本資料</p>
+            </div>
+
+            <div class = "loginInputs">
+                <div class="field">
+                    <input id="name" type="text" placeholder="姓名">
+                    <div class="error" id="nameError"></div>
+                </div>
+            
+                <div class="field">
+                    <input id="age" type="number" placeholder="年齡">
+                    <div class="error" id="ageError"></div>
+                </div>
+
+                <div class="field">
+                    <input id="idNumber" type="number" placeholder="身分證字號後三碼">
+                    <div class="error" id="idNumberError"></div>
+                </div>
+
+                <div class="field">
+                    <input id="MMSE" placeholder="簡易心智量表(MMSE)分數">
+                    <div class="error" id="MMSEError"></div>
+                </div>
+
+                <div class="field">
+                    <select id="gender">
+                        <option value="">請選擇性別</option>
+                        <option value="male">男性</option>
+                        <option value="female">女性</option>
+                    </select>
+                    <div class="error" id="genderError"></div>
+                </div>
+
+                <button id = "loginButton">完成登入</button>
+            </div>
+        </div>
+    
+        <div class = "screen control hidden">
+            <button class="btn" id = "btnSemantic">有人不合群</button>
+            <button class="btn" id = "btnMemory">數字點點名</button>
+            <button class="btn" id = "btnVisualSearch">抓出冒牌貨</button>
+            <button class="btn" id = "btnSpatial">圖形轉轉樂</button>
+            <button class="btn" id = "btnSwitching">心智切換力</button>
+        </div>
+
+        <div class = "screen instructions hidden">
+
+            <div id = "gameTitle" class="hidden"></div>
+
+            <div id = "instructionText" class="hidden"></div>
+
+            <div class="buttonType hidden">
+                <button class="btn" id = "picture">圖片題</button>
+                <button class="btn" id = "character">文字題</button>
+            </div>
+
+            <div class="buttonLevel hidden">
+                <button class="btn" id = "easy">易</button>
+                <button class="btn" id = "medium">中</button>
+                <button class="btn" id = "hard">難</button>                
+            </div>
+        
+            <div class="buttonGroup hidden">
+                <button class="btn" id = "practiceButton">試玩</button>
+                <button class="btn" id = "startButton">開始遊戲</button>
+            </div>
+
+            <div class="gameArea hidden">
+                <div class="buttons"></div>
+                <div id="overlayContainer"></div>
+                <div id="result"></div>
+            </div>
+        </div>
+    
+        <div class="screen result hidden">
+            <div id="playerScore"></div>
+
+            <button id="continueButton">繼續遊玩</button>
+            <button id="endButton">結束遊玩</button>
+
+            <canvas id="radarChart"></canvas>
+        </div>
+
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
