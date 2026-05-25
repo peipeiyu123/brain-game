@@ -166,6 +166,14 @@ document.getElementById("loginButton").addEventListener("click", () => {
         hardScore
     });
 
+    console.log({
+        easyScore,
+        mediumScore,
+        hardScore
+    });
+
+    console.log("payload:", Object.fromEntries(payload));
+
     /*前端送資料*/
     fetch("https://script.google.com/macros/s/AKfycbxwU-QQT9RHJYTMT9anSbwOUVrFaJ9CTHrq17-76uoxtMb9Fa9HtkExEzPh_q-4Bsz3/exec", {
         method: "POST",
@@ -494,7 +502,7 @@ function showOverlay(type) {
     }, 800);
 }
 
-function checkAnswer(answers) {
+function checkAnswer(answer) {
 
     if (isLocked) return;
     isLocked = true;
@@ -506,19 +514,19 @@ function checkAnswer(answers) {
     let isCorrect = false;
 
     if (difficulty === "hard") {
-        isCorrect = answers.every(a => a !== correct);
+        isCorrect = answer.every(a => a !== correct);
     } else {
-        isCorrect = answers[0] !== correct;
+        isCorrect = answer[0] !== correct;
     }
 
     if (isCorrect) {
+        if (difficulty === "easy") easyScore++;
+        if (difficulty === "medium") mediumScore++;
+        if (difficulty === "hard") hardScore++;
         showOverlay("correct");
-        score++;
     } else {
         showOverlay("wrong");
     }
-
-    selectedAnswers = [];
 
     current++;
 
@@ -532,7 +540,10 @@ function startExperiment(isPractice = false) {
 
     isPracticeMode = isPractice;
 
-    score = 0;
+    if (difficulty === "easy") easyScore = 0;
+    if (difficulty === "medium") mediumScore = 0;
+    if (difficulty === "hard") hardScore = 0;
+
     current = 0;
 
     currentQuestions = [];
@@ -574,14 +585,54 @@ function resetInstructionsUI() {
 }
 
 function showResult() {
-    gameScores.semantic = score;
+
+    if (difficulty === "easy") {
+        console.log("easyScore set =", easyScore);
+    }
+
+    if (difficulty === "medium") {
+        console.log("mediumScore set =", mediumScore);
+    }
+
+    if (difficulty === "hard") {
+        console.log("hardScore set =", hardScore);
+    }
 
     showScreen(document.querySelector(".result"));
 
+    const finalScore =
+        difficulty === "easy" ? easyScore :
+        difficulty === "medium" ? mediumScore :
+        hardScore;
+
     document.getElementById("playerScore").textContent =
-        `你的分數：${score} / ${currentQuestions.length}`;
-    
-    if (difficulty === "easy") easyScore = score;
-    if (difficulty === "medium") mediumScore = score;
-    if (difficulty === "hard") hardScore = score;
+        `你的分數：${finalScore} / ${currentQuestions.length}`;
+
+    sendData();
+}
+
+function sendData() {
+    const name = document.getElementById("name").value.trim();
+    const age = document.getElementById("age").value.trim();
+    const idNumber = document.getElementById("idNumber").value.trim();
+    const MMSE = document.getElementById("MMSE").value.trim();
+    const gender = document.getElementById("gender").value;
+
+    const payload = new URLSearchParams({
+        name,
+        age,
+        idNumber,
+        MMSE,
+        gender,
+        easyScore,
+        mediumScore,
+        hardScore
+    });
+
+    fetch("https://script.google.com/macros/s/AKfycbxwU-QQT9RHJYTMT9anSbwOUVrFaJ9CTHrq17-76uoxtMb9Fa9HtkExEzPh_q-4Bsz3/exec", {
+        method: "POST",
+        body: payload
+    })
+    .then(res => res.text())
+    .then(data => console.log("送出結果:", data));
 }
