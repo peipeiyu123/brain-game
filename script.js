@@ -48,7 +48,7 @@ function validateIdNumber(){
     const id = document.getElementById("idNumber");
     const value = id.value.trim();
 
-    if(!value || value < 100 || value > 999){
+    if(!value || value < 0 || value > 999){
         setError(id, "請輸入身分證後三碼");
         return false;
     }
