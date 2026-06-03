@@ -68,23 +68,18 @@
                 <button class="btn" id = "picture">圖片題</button>
                 <button class="btn" id = "character">文字題</button>
             </div>
-
-            <div class="buttonLevel hidden">
-                <button class="btn" id = "easy">易</button>
-                <button class="btn" id = "medium">中</button>
-                <button class="btn" id = "hard">難</button>                
-            </div>
         
             <div class="buttonGroup hidden">
                 <button class="btn" id = "practiceButton">試玩</button>
                 <button class="btn" id = "startButton">開始遊戲</button>
             </div>
+        </div>
 
-            <div class="gameArea hidden">
-                <div class="buttons"></div>
-                <div id="overlayContainer"></div>
-                <div id="result"></div>
-            </div>
+        <div class="screen gameArea hidden">
+            <div id = "progress"></div>
+            <div class="buttons"></div>
+            <div id="overlayContainer"></div>
+            <div id="result"></div>
         </div>
     
         <div class="screen result hidden">
@@ -96,8 +91,29 @@
             <canvas id="radarChart"></canvas>
         </div>
 
+        <div class=" screen memoryArea screen hidden">
+
+            <div id="memoryDisplay"></div>
+            <div id="memoryInstruction"></div>
+
+            <div id="memoryInput"></div>
+
+            <div class="keypad">
+                <button>1</button><button>2</button><button>3</button>
+                <button>4</button><button>5</button><button>6</button>
+                <button>7</button><button>8</button><button>9</button>
+                <button>⌫</button><button>0</button><button>✔</button>
+            </div>
+
+            <button id="memoryFinishBtn">完成</button>
+
+            <div id="memoryResult"></div>
+        </div>
+        
+
     </div>
     
     <script src="script.js"></script>
+    <script src="memoryScript.js"></script>
 </body>
 </html>
