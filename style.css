@@ -1,17 +1,22 @@
 html, body{ 
     height: 100%;
-     width: 100%; 
-     display: flex; 
-     flex-direction: column; 
-     align-items: center; 
-     margin: 0; 
-     overflow: hidden; 
+    width: 100%; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    margin: 0; 
+    overflow: hidden; 
 } 
 
 .app{ 
     width: 100%; 
     height: 100vh; 
     position: relative; 
+} 
+
+/* 絕對最高優先權：只要加上 .hidden，不管是誰都必須徹底消失，不准留下透明防護罩 */
+.hidden { 
+    display: none !important; 
 } 
 
 /*遊戲名稱*/ 
@@ -155,10 +160,6 @@ input.error, select.error{
     margin-top: 10px; 
 } 
 
-.hidden{ 
-    display: none !important; 
-} 
-
 .buttonGroup{ 
     display: flex; 
     gap: 20px; 
@@ -172,26 +173,33 @@ input.error, select.error{
     gap: 15px; 
 } 
 
-/*答對、錯之圈圈叉叉*/ 
-.overlay { 
-    position: absolute; 
-    top: 50%; 
-    left: 50%; 
-    transform: translate(-50%, -50%); 
-    font-size: 120px; 
-    font-weight: bold; 
-    pointer-events: none; 
-    z-index: 999; 
-    animation: pop 0.4s ease; 
-} 
+/* 文字題：讓中文字大又清晰（對應 js 中的文字模式） */
+.buttons button.text-mode-btn {
+    font-size: 32px;
+    font-weight: bold;
+    color: #333;
+}
 
-.overlay.correct { 
-    color: #00c853; 
-} 
+/* 全域大勾勾大叉叉動態回饋（對應 showOverlay） */
+.overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 120px;
+    font-weight: bold;
+    z-index: 9999;
+}
 
-.overlay.wrong { 
-    color: #ff1744; 
-} 
+/* 答對的綠色大勾勾 */
+.overlay.correct {
+    color: green;
+}
+
+/* 答錯的紅色大叉叉 */
+.overlay.wrong {
+    color: red;
+}
 
 @keyframes pop { 
     0% { 
@@ -202,7 +210,12 @@ input.error, select.error{
         transform: translate(-50%, -50%) scale(1); 
         opacity: 1; 
     } 
-} 
+}
+
+/* 確保要顯示大勾勾叉叉的父容器能以此為基準置中 */
+.gameArea, .memoryArea {
+    position: relative;
+}
 
 .gameArea { 
     display: flex; 
@@ -232,7 +245,7 @@ input.error, select.error{
     height: 180px; 
 } 
 
-.buttons button:hover {
+.buttons button:hover { 
     border-color: #4CAF50; 
 } 
 
@@ -254,17 +267,134 @@ input.error, select.error{
     font-size: 20px; 
 } 
 
-/*數字點點名*/ 
-.keypad{ 
-    display:grid; 
-    grid-template-columns: repeat(3,80px); 
-    gap:10px; margin-top:20px; 
+/* =======================================================
+   數字點點名（記憶測驗）極致置中與自適應防爆框
+   ======================================================= */
+.screen.memoryArea { 
+    display: flex; /* 移除此處的 !important，交給 .hidden 控制生产品 */
+    flex-direction: column; 
+    align-items: center;       /* 水平置中 */
+    justify-content: center;    /* 垂直置中 */
+    text-align: center; 
+    
+    height: 100vh;  
+    width: 100vw; 
+    left: 0;
+    top: 0;
+    
+    padding: 20px; 
+    padding-top: 0px; 
+    box-sizing: border-box; 
+    overflow: hidden; 
 } 
 
-.keypad button{ 
-    height:60px; 
-    font-size:24px; 
+/* 提示文字（第 X 題） */
+#memoryInstruction {
+    font-size: clamp(26px, 4.5vh, 34px); 
+    font-weight: bold; 
+    color: #333; 
+    margin-bottom: 2vh; 
+}
+
+/* 顯示數字：使用 vh 確保不撐破頁面 */
+#memoryDisplay {
+    font-size: 10vh; 
+    font-weight: 800; 
+    letter-spacing: 12px; 
+    color: #007bff; 
+    height: 14vh;
+    min-height: 80px;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    margin-bottom: 2vh; 
+    background: #f8f9fa; 
+    width: 90%; 
+    max-width: 450px;
+    border-radius: 15px; 
+    border: 2px dashed #ddd; 
+    box-sizing: border-box;
+}
+
+/* 使用者輸入框區塊 */
+.memoryInputContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
+    max-width: 450px;
+    margin-bottom: 1.5vh;
+}
+
+#memoryInput {
+    font-size: 7vh; 
+    font-weight: bold; 
+    letter-spacing: 6px; 
+    color: #28a745; 
+    height: 9vh;
+    min-height: 60px;
+    border-bottom: 3px solid #28a745; 
+    padding: 0 15px; 
+    width: 70%;
+    text-align: center; 
+}
+
+#memoryResult {
+    font-size: 7vh; 
+    font-weight: bold; 
+    width: 20%;
+    height: 9vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* =======================================================
+   數字鍵盤：強制保持漂亮的三欄九宮格，並且完全置中
+   ======================================================= */
+.keypad { 
+    display: grid; 
+    grid-template-columns: repeat(3, 11vh); 
+    gap: 1.5vh; 
+    justify-content: center;
+    width: 100%;
+    max-width: 450px;
 } 
+
+.keypad button {
+    width: 11vh;
+    height: 9vh; 
+    max-width: 85px;
+    max-height: 70px;
+    min-width: 60px;
+    min-height: 50px;
+    font-size: 3.5vh; 
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* 按鈕與狀態控制 */
+.keypad button:active:not(:disabled), .buttons button:active, .btn:active {
+    transform: scale(0.92);
+}
+
+.keypad button, .buttons button, .btn {
+    user-select: none;
+    -webkit-user-select: none;
+    transition: transform 0.1s ease;
+}
+
+button:disabled {
+    background-color: #f0f0f0 !important;
+    border-color: #ddd !important;
+    color: #aaa !important;
+    cursor: not-allowed;
+    box-shadow: none !important;
+}
 
 /*結果區*/ 
 .result { 
@@ -274,8 +404,8 @@ input.error, select.error{
     align-items: center; 
     height: 100vh; 
     text-align: center; 
-    gap: 20px; 
-} 
+    gap: 20px;
+}
 
 #playerScore { 
     font-size: 28px; 
