@@ -129,7 +129,7 @@ const categories = {
     },
     nonliving: {
       transportation: ["汽車", "火車", "飛機", "腳踏車", "機車", "公車", "卡車", "船", "直升機"],
-      instrument: ["鋼琴", "吉他", "小提琴", "爵士鼓", "小號", "長笛", "豎琴", "古箏", "三角鐵"],
+      instrument: ["鋼琴", "吉他", "小提琴", "爵士鼓", "長笛", "豎琴", "古箏", "三角鐵"],
       stationery: ["鉛筆", "原子筆", "尺", "剪刀", "橡皮擦", "膠帶", "彩色筆", "筆記本", "迴紋針"]
     }
   }
@@ -182,7 +182,7 @@ function showStageInstruction() {
   let text = "";
 
   const diffTxt = stage === "easy" ? "易" : stage === "medium" ? "中" : "難";
-  title = `語意測驗（${diffTxt}）`;
+  title = `找出不合群–${diffTxt}`;
 
   if (semanticMode === "picture") {
     if (stage === "easy") {
