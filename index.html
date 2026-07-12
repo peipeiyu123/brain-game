@@ -10,44 +10,48 @@
     <div class = "app">
 
         <div class="screen login">
-            <div id = "projectName">高齡者大腦體操</div>
-
-            <div class = "loginTitle">
-            <p>請輸入基本資料</p>
+            <!-- 1. 遊戲首頁：預設只顯示名稱與這兩個大按鈕 -->
+            <div class="main-menu-container">
+                <h1 id="projectName">高齡者大腦體操</h1>
+                <button id="tabLogin" class="btn">登入帳號</button>
+                <button id="tabRegister" class="btn">註冊帳號</button> 
             </div>
 
-            <div class = "loginInputs">
-                <div class="field">
-                    <input id="name" type="text" placeholder="姓名">
-                    <div class="error" id="nameError"></div>
+            <!-- 2. 登入表單畫面：點擊登入後，大按鈕消失，這裡獨立在中央漂亮顯示 -->
+            <form id="loginForm" class="auth-form hidden">
+                <h2 class="loginTitle">會員登入</h2>
+                <div class="loginInputs">
+                    <input type="text" id="loginAccount" placeholder="請輸入帳號" required>
+                    <input type="password" id="loginPassword" placeholder="請輸入密碼" required>
                 </div>
-            
-                <div class="field">
-                    <input id="age" type="number" placeholder="年齡">
-                    <div class="error" id="ageError"></div>
-                </div>
+                <button type="button" id="btnSubmitLogin" class="btn">確認登入</button>
+                <button type="button" class="btn btn-back" onclick="backToMainMenu()">返回主選單</button>
+            </form>
 
-                <div class="field">
-                    <input id="idNumber" type="number" placeholder="身分證字號後三碼">
-                    <div class="error" id="idNumberError"></div>
+            <!-- 3. 註冊表單畫面：點擊註冊後顯示 -->
+            <form id="registerForm" class="auth-form hidden">
+                <h2 class="loginTitle">建立新帳號</h2>
+                <div class="loginInputs">
+                    <input type="text" id="regAccount" placeholder="請設定帳號" required>
+                    <input type="password" id="regPassword" placeholder="請設定密碼" required>
                 </div>
-
-                <div class="field">
-                    <input id="MMSE" placeholder="簡易心智量表(MMSE)分數">
-                    <div class="error" id="MMSEError"></div>
+                <hr>
+                <div class="form-container">
+                    <h2>填寫問卷調查</h2>
+                    <iframe
+                        id="google-form-iframe"
+                        src="" 
+                        width="100%" 
+                        height="450" 
+                        frameborder="0" 
+                        marginheight="0" 
+                        marginwidth="0">
+                        載入中…
+                    </iframe>
                 </div>
-
-                <div class="field">
-                    <select id="gender">
-                        <option value="">請選擇性別</option>
-                        <option value="male">男性</option>
-                        <option value="female">女性</option>
-                    </select>
-                    <div class="error" id="genderError"></div>
-                </div>
-
-                <button id = "loginButton">完成登入</button>
-            </div>
+                <button type="button" id="btnSubmitRegister" class="btn">註冊完成</button>
+                <button type="button" class="btn btn-back" onclick="backToMainMenu()">返回主選單</button>
+            </form>
         </div>
     
         <div class = "screen control hidden">
@@ -108,6 +112,11 @@
             <div id="memoryResult"></div>
         </div>
         
+        <div class="screen visualArea hidden">
+            <div id="visualProgress"></div>
+            <div id="visualButtons" class="buttons"></div>
+            <div id="visualOverlayContainer"></div>
+        </div>
 
     </div>
     

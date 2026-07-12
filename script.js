@@ -12,14 +12,14 @@ const instructionText = document.getElementById("instructionText");
 const buttonsContainer = document.querySelector(".buttons");
 const gameArea = document.querySelector(".gameArea");
 const overlayContainer = document.getElementById("overlayContainer");
-
 const btnMemory = document.getElementById("btnMemory"); 
 
 let semanticMode = "picture";
-let currentGame = null; // "semantic" 或 "memory"
+let currentGame = null; // "semantic", "memory", "visual"
 let isPracticeMode = false;
 let totalQuestionAll = 0;
 let gameScores = { semantic: 0, memory: 0, visualSearch: 0, spatial: 0, switching: 0 };
+let currentUserId = "";
 
 function showScreen(screen) {
   document.querySelectorAll(".screen").forEach(s => s.classList.add("hidden"));
@@ -29,75 +29,89 @@ function showScreen(screen) {
 function resetInstructionsUI() {
   gameTitle.innerHTML = "";
   instructionText.textContent = "";
-  buttonType.classList.add("hidden");
-  buttonGroup.classList.add("hidden");
+  buttonType.classList.add("hidden"); //圖片題 或 文字題
+  buttonGroup.classList.add("hidden"); //試玩 或 開始遊戲
 }
 
-// 表單驗證
-function setError(element, message) {
-  element.classList.add("error");
-  const errEl = document.getElementById(element.id + "Error");
-  if (errEl) errEl.textContent = message;
+// ==========================================
+// 切換登入/註冊帳號（完美修正版：點擊時會隱藏主選單大按鈕）
+// ==========================================
+const tabLogin = document.getElementById("tabLogin");
+const tabRegister = document.getElementById("tabRegister");
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+const mainMenuContainer = document.querySelector(".main-menu-container"); // 抓取主選單容器
+
+tabLogin.addEventListener("click", () => {
+  // 隱藏主選單的兩個大按鈕，顯示登入輸入框
+  mainMenuContainer.classList.add("hidden");
+  loginForm.classList.remove("hidden");
+  registerForm.classList.add("hidden");
+});
+
+tabRegister.addEventListener("click", () => {
+  // 隱藏主選單的兩個大按鈕，顯示註冊與問卷
+  mainMenuContainer.classList.add("hidden");
+  registerForm.classList.remove("hidden");
+  loginForm.classList.add("hidden");
+  
+  const regAccount = document.getElementById("regAccount").value.trim();
+
+  if (!regAccount) {
+    alert("請先在上方設定好您的『帳號』與『密碼』，下方問卷調查就會自動帶入您的遊戲ID！");
+    return;
+  }
+
+  currentUserId = regAccount;
+
+  const finalFormUrl = `https://docs.google.com/forms/d/e/1FAIpQLSc_s_7OibN8XDhCuGzB4yxQNy8a80yO7YpKY4EiXhBl4TbQ_Q/viewform?embedded=true&usp=pp_url&entry.782011933=${encodeURIComponent(currentUserId)}`;
+
+  document.getElementById("google-form-iframe").src = finalFormUrl;
+});
+
+// 貼心功能：回到主選單的函式，等一下按鈕會用到
+function backToMainMenu() {
+  mainMenuContainer.classList.remove("hidden");
+  loginForm.classList.add("hidden");
+  registerForm.classList.add("hidden");
 }
 
-function clearError(element) {
-  element.classList.remove("error");
-  const errEl = document.getElementById(element.id + "Error");
-  if (errEl) errEl.textContent = "";
-}
+document.getElementById("btnSubmitLogin").addEventListener("click", () => {
+  const loginAccount = document.getElementById("loginAccount").value.trim();
+  const loginPass = document.getElementById("loginPassword").value.trim();
 
-function validateName() {
-  const n = document.getElementById("name");
-  const value = n.value.trim();
-  if (!value) { setError(n, "請輸入姓名"); return false; }
-  clearError(n); return true;
-}
-function validateAge() {
-  const a = document.getElementById("age");
-  const value = a.value.trim();
-  if (!value) { setError(a, "請輸入年齡"); return false; }
-  if (isNaN(value) || value <= 0 || value > 130) { setError(a, "請輸入正確年齡"); return false; }
-  clearError(a); return true;
-}
-function validateIdNumber() {
-  const id = document.getElementById("idNumber");
-  const value = id.value.trim();
-  if (!value || value < 0 || value > 999) { setError(id, "請輸入身分證後三碼"); return false; }
-  clearError(id); return true;
-}
-function validateMMSE() {
-  const m = document.getElementById("MMSE");
-  const value = m.value.trim();
-  if (!value) { setError(m, "請輸入MMSE"); return false; }
-  if (isNaN(value) || value < 0 || value > 30) { setError(m, "MMSE為0～30分"); return false; }
-  clearError(m); return true;
-}
-function validateGender() {
-  const g = document.getElementById("gender");
-  if (!g.value) { setError(g, "請選擇性別"); return false; }
-  clearError(g); return true;
-}
+  if (!loginAccount || !loginPass) { alert("請輸入帳號與密碼！"); return; }
 
-// 綁定輸入即時驗證
-document.getElementById("name").addEventListener("input", validateName);
-document.getElementById("age").addEventListener("input", validateAge);
-document.getElementById("idNumber").addEventListener("input", validateIdNumber);
-document.getElementById("MMSE").addEventListener("input", validateMMSE);
-document.getElementById("gender").addEventListener("change", validateGender);
-
-document.getElementById("loginButton").addEventListener("click", () => {
-  const valid = validateName() && validateAge() && validateIdNumber() && validateMMSE() && validateGender();
-  if (!valid) { alert("請修正錯誤資料"); return; }
+  currentUserId = loginAccount;
   showScreen(control);
 });
 
+document.getElementById("btnSubmitRegister").addEventListener("click", () => {
+  const regAccount = document.getElementById("regAccount").value.trim();
+  const regPass = document.getElementById("regPassword").value.trim();
+
+  if (!regAccount || !regPass) { alert("請輸入您要設定的帳號與密碼！"); return; }
+
+  const confirmStart = confirm("提醒您：下方的問卷調查是否已經點擊『提交』按鈕了呢？填寫完提交後才能開始玩遊戲喔！");
+
+  if (confirmStart) {
+    currentUserId = regAccount;
+    showScreen(control);
+  }
+});
 
 // ==========================================
 // 遊戲一：找出不合群 (Semantic Game)
 // ==========================================
-let difficulty = "easy"; // easy, medium, hard
+let difficulty = "easy"; 
 let current = 0;
-let easyScore = 0, mediumScore = 0, hardScore = 0;
+
+let imgEasyScore = 0, imgMediumScore = 0, imgHardScore = 0;
+let textEasyScore = 0, textMediumScore = 0, textHardScore = 0;
+let imgTotalQuestions = 0;
+let textTotalQuestions = 0;
+
+let easyScore = 0, mediumScore = 0, hardScore = 0; 
 let currentQuestions = [];
 let timer = null;
 let timeLimit = 0;
@@ -137,12 +151,7 @@ const categories = {
 
 document.getElementById("btnSemantic").addEventListener("click", () => {
   resetInstructionsUI();
-  
-  easyScore = 0;
-  mediumScore = 0;
-  hardScore = 0;
-  totalQuestionAll = 0; 
-  
+  currentGame = "semantic";
   gameTitle.innerHTML = `<h2>找出不合群</h2>`;
   showInstructions("type");
 });
@@ -160,6 +169,12 @@ document.getElementById("picture").addEventListener("click", () => {
   semanticMode = "picture";
   stage = "easy";
   isPracticeMode = true;
+  
+  imgEasyScore = 0; 
+  imgMediumScore = 0; 
+  imgHardScore = 0;
+  imgTotalQuestions = 0;
+  
   showStageInstruction();
 });
 
@@ -167,6 +182,12 @@ document.getElementById("character").addEventListener("click", () => {
   semanticMode = "character"; 
   stage = "easy";
   isPracticeMode = true;
+  
+  textEasyScore = 0; 
+  textMediumScore = 0; 
+  textHardScore = 0;
+  textTotalQuestions = 0;
+  
   showStageInstruction();
 });
 
@@ -235,11 +256,17 @@ function showStageInstruction() {
 
 function loadStageQuestions() {
   document.getElementById("progress").classList.remove("hidden");
-  // 【CSS化】移除 .style.display，直接利用 hidden 類別切換
   buttonsContainer.innerHTML = "";
   currentQuestions = [];
   let count = isPracticeMode ? 1 : 5;
-  if (!isPracticeMode) totalQuestionAll += count;
+  
+  if (!isPracticeMode) {
+    if (semanticMode === "picture") {
+      imgTotalQuestions += count;
+    } else {
+      textTotalQuestions += count;
+    }
+  }
 
   for (let i = 0; i < count; i++) {
     const q = generateQuestion(stage);
@@ -331,8 +358,8 @@ function loadQuestion() {
   else if (difficulty === "medium") timeLimit = 8;
   else timeLimit = 12;
 
-  // 網格佈局原本就是透過 JS 根據題目數量改變（屬於結構性佈局），此處保留
-  buttonsContainer.style.gridTemplateColumns = q.items.length === 6 ? "repeat(3, 180px)" : "repeat(2, 180px)";
+  buttonsContainer.removeAttribute("style"); 
+  buttonsContainer.classList.add("buttons-grid");
   
   q.items.forEach(itemData => {
     const btn = document.createElement("button");
@@ -344,7 +371,6 @@ function loadQuestion() {
       btn.appendChild(img);
     } else {
       btn.textContent = itemData.content;
-      // 【CSS化】移除所有寫死的 style 行內樣式，改用統一的 class 控制大字體
       btn.classList.add("text-mode-btn");
     }
     
@@ -401,9 +427,15 @@ function checkAnswer(answer) {
 
   if (isCorrect) {
     if (!isPracticeMode) {
-      if (difficulty === "easy") easyScore++;
-      if (difficulty === "medium") mediumScore++;
-      if (difficulty === "hard") hardScore++;
+      if (semanticMode === "picture") {
+        if (difficulty === "easy") imgEasyScore++;
+        if (difficulty === "medium") imgMediumScore++;
+        if (difficulty === "hard") imgHardScore++;
+      } else {
+        if (difficulty === "easy") textEasyScore++;
+        if (difficulty === "medium") textMediumScore++;
+        if (difficulty === "hard") textHardScore++;
+      }
     }
     showOverlay("correct");
   } else {
@@ -423,6 +455,7 @@ function nextQuestion() {
 function showOverlay(type) {
   const gameAreaEl = document.querySelector(".gameArea");
   const memoryAreaEl = document.querySelector(".memoryArea");
+  const visualAreaEl = document.querySelector(".visualArea");
   let currentContainer = null;
 
   if (gameAreaEl && !gameAreaEl.classList.contains("hidden")) {
@@ -431,11 +464,13 @@ function showOverlay(type) {
   else if (memoryAreaEl && !memoryAreaEl.classList.contains("hidden")) {
     currentContainer = document.getElementById("memoryResult") || memoryAreaEl;
   }
+  else if (visualAreaEl && !visualAreaEl.classList.contains("hidden")) {
+    currentContainer = document.getElementById("visualOverlayContainer") || visualAreaEl;
+  }
 
   if (!currentContainer) return;
 
   const div = document.createElement("div");
-  // 【CSS化】完全剝離 inline 樣式，交給 css 檔案裡的 .overlay 處理
   div.className = `overlay ${type}`;
   div.textContent = type === "correct" ? "✔" : "✖";
 
@@ -451,15 +486,30 @@ function goNextStage() {
 
 function showSemanticResult() {
   showScreen(document.querySelector(".result"));
+  
+  easyScore = imgEasyScore + textEasyScore;
+  mediumScore = imgMediumScore + textMediumScore;
+  hardScore = imgHardScore + textHardScore;
+  
   const totalScore = easyScore + mediumScore + hardScore;
-  const accuracy = totalQuestionAll ? ((totalScore / totalQuestionAll) * 100).toFixed(1) : 0;
-  document.getElementById("playerScore").textContent = `語意測驗總分：${totalScore} / ${totalQuestionAll} （正確率：${accuracy}%）`;
+  const combinedTotalQuestions = imgTotalQuestions + textTotalQuestions;
+  
+  const accuracy = combinedTotalQuestions ? ((totalScore / combinedTotalQuestions) * 100).toFixed(1) : 0;
+  
+  document.getElementById("playerScore").innerHTML = `
+    <h2>找出不合群 測試完成</h2>
+    易（圖片+文字）：${easyScore} 分<br>
+    中（圖片+文字）：${mediumScore} 分<br>
+    難（圖片+文字）：${hardScore} 分<br>
+    <b>總得分：${totalScore} / ${combinedTotalQuestions} （正確率：${accuracy}%）</b>
+  `;
+  
   gameScores.semantic = totalScore;
+  sendData();
 }
 
 document.getElementById("continueButton").addEventListener("click", () => showScreen(control));
 document.getElementById("endButton").addEventListener("click", () => alert("即將呈現所有遊戲統計雷達圖"));
-
 
 // ==========================================
 // 遊戲二：數字點點名 (Memory Game)
@@ -500,6 +550,7 @@ function showMemoryInstruction() {
   gameTitle.classList.remove("hidden");
   instructionText.classList.remove("hidden");
   document.querySelector(".buttonGroup").classList.remove("hidden");
+  buttonType.classList.add("hidden");
 
   if (memoryStage === "easy") {
     gameTitle.innerHTML = `<h2>數字點點名–易</h2>`;
@@ -526,7 +577,6 @@ function startMemoryGame() {
 
 function loadMemoryStage() {
   memoryQuestions = [];
-
   let count = isPracticeMode ? 1 : 5;
   let cfg = memoryConfig[memoryStage];
 
@@ -590,7 +640,6 @@ function enableKeypad(bool) {
   document.querySelectorAll(".keypad button").forEach(b => b.disabled = !bool);
 }
 
-// 統一由代碼內監聽鍵盤按鍵
 const keypadButtons = document.querySelectorAll(".keypad button");
 keypadButtons.forEach(btn => {
   const newBtn = btn.cloneNode(true);
@@ -663,32 +712,287 @@ function showMemoryResult() {
 }
 
 // ==========================================
+// 遊戲三：抓出冒牌貨 (Visual Search Game)
+// ==========================================
+let visualEasyScore = 0, visualMediumScore = 0, visualHardScore = 0;
+let visualTotalQuestions = 0;
+
+const visualMediumPairs = [
+  { target: "N", distractor: "M" },
+  { target: "V", distractor: "W" },
+  { target: "F", distractor: "H" },
+  { target: "X", distractor: "Y" },
+  { target: "R", distractor: "B" }
+];
+const visualHardPairs = [
+  { target: "T", distractor: "I" },
+  { target: "K", distractor: "X" },
+  { target: "Q", distractor: "O" },
+  { target: "R", distractor: "P" },
+  { target: "F", distractor: "E" }
+];
+
+document.getElementById("btnVisualSearch").addEventListener("click", () => {
+  resetInstructionsUI();
+  
+  currentGame = "visual";
+  visualEasyScore = 0;
+  visualMediumScore = 0;
+  visualHardScore = 0;
+  visualTotalQuestions = 0;
+  stage = "easy";
+  isPracticeMode = true;
+  
+  showVisualStageInstruction(); 
+});
+
+function showVisualStageInstruction() {
+  showScreen(instructions);
+  gameTitle.classList.remove("hidden");
+  instructionText.classList.remove("hidden");
+  buttonGroup.classList.remove("hidden");
+  buttonType.classList.add("hidden"); 
+
+  let title = "";
+  let text = "";
+  const diffTxt = stage === "easy" ? "易" : stage === "medium" ? "中" : "難";
+  title = `抓出冒牌貨–${diffTxt}`;
+
+  if (stage === "easy") {
+    text = `每一題將呈現 4×4 的字母，其中有一個字母的特徵與其他不同，請從中找出那一個不同的字母。作答時間為 3 秒，超過算錯。`;
+  } else if (stage === "medium") {
+    text = `每一題將呈現 5×5 的字母，其中有一個字母的特徵與其他不同，請從中找出那一個不同的字母。作答時間為 6 秒，超過算錯。`;
+  } else if (stage === "hard") {
+    text = `每一題將呈現 6×6 的字母，其中有一個字母的特徵與其他不同，請從中找出那一個不同的字母。作答時間為 9 秒，超過算錯。`;
+  }
+
+  gameTitle.innerHTML = `<h2>${title}</h2>`;
+  instructionText.innerHTML = text;
+
+  document.getElementById("practiceButton").onclick = () => {
+    isPracticeMode = true;
+    showScreen(document.querySelector(".visualArea"));
+    loadVisualStageQuestions();
+  };
+  
+  document.getElementById("startButton").onclick = () => {
+    isPracticeMode = false;
+    showScreen(document.querySelector(".visualArea"));
+    loadVisualStageQuestions();
+  };
+}
+
+function generateVisualQuestion(diff) {
+  let gridSize = 4; 
+  let targetChar = "";
+  let distractorChar = "";
+  
+  if (diff === "easy") {
+    gridSize = 4; 
+    const straight = ["A","E","F","H","I","K","L","M","N","T","V","W","X","Y","Z"];
+    const curved = ["B","C","D","G","J","O","P","Q","R","S","U"];
+    
+    if (Math.random() > 0.5) {
+      targetChar = getRandom(straight);
+      distractorChar = getRandom(curved);
+    } else {
+      targetChar = getRandom(curved);
+      distractorChar = getRandom(straight);
+    }
+  } 
+  else if (diff === "medium") {
+    gridSize = 5; 
+    const pair = getRandom(visualMediumPairs);
+    targetChar = Math.random() > 0.5 ? pair.target : pair.distractor;
+    distractorChar = targetChar === pair.target ? pair.distractor : pair.target;
+  } 
+  else if (diff === "hard") {
+    gridSize = 6; 
+    const pair = getRandom(visualHardPairs);
+    targetChar = Math.random() > 0.5 ? pair.target : pair.distractor;
+    distractorChar = targetChar === pair.target ? pair.distractor : pair.target;
+  }
+
+  const totalCells = gridSize * gridSize;
+  let items = [];
+  
+  items.push({ content: targetChar, isTarget: true });
+  
+  for (let i = 0; i < totalCells - 1; i++) {
+    items.push({ content: distractorChar, isTarget: false });
+  }
+  
+  items.sort(() => Math.random() - 0.5);
+  return { gridSize, items };
+}
+
+function loadVisualStageQuestions() {
+  document.getElementById("progress").classList.remove("hidden");
+  const visualButtons = document.getElementById("visualButtons"); 
+  visualButtons.innerHTML = "";
+  currentQuestions = [];
+  
+  let count = isPracticeMode ? 1 : (stage === "easy" ? 15 : stage === "medium" ? 10 : 5);
+  
+  if (!isPracticeMode) visualTotalQuestions += count;
+
+  for (let i = 0; i < count; i++) {
+    const q = generateVisualQuestion(stage);
+    currentQuestions.push(q);
+  }
+  current = 0;
+  loadVisualQuestion();
+}
+
+function loadVisualQuestion() {
+  if (current >= currentQuestions.length) {
+    if (isPracticeMode) {
+      isPracticeMode = false;
+      showVisualStageInstruction(); 
+    } else {
+      goNextVisualStage(); 
+    }
+    return;
+  }
+
+  const q = currentQuestions[current];
+  visualButtons.innerHTML = "";
+  
+  document.getElementById("progress").textContent = `視覺搜尋｜${stage.toUpperCase()}｜第 ${current + 1} / ${currentQuestions.length} 題`;
+  
+  // 🎯 完美修正：時間判定改為 3 / 6 / 9 秒
+  if (stage === "easy") {
+    timeLimit = 3;
+  } else if (stage === "medium") {
+    timeLimit = 6;
+  } else if (stage === "hard") {
+    timeLimit = 9;
+  }
+
+  visualButtons.removeAttribute("style"); 
+  visualButtons.style.display = "grid";
+  visualButtons.style.gridTemplateColumns = `repeat(${q.gridSize}, 1fr)`;
+  visualButtons.style.gap = "8px";
+  
+  q.items.forEach(item => {
+    const btn = document.createElement("button");
+    btn.textContent = item.content;
+    btn.classList.add("text-mode-btn"); 
+    
+    btn.addEventListener("click", () => {
+      if (isLocked) return;
+      isLocked = true;
+      clearInterval(timer);
+      
+      if (item.isTarget) {
+        if (!isPracticeMode) {
+          if (stage === "easy") visualEasyScore++;
+          if (stage === "medium") visualMediumScore++;
+          if (stage === "hard") visualHardScore++;
+        }
+        showOverlay("correct"); 
+      } else {
+        showOverlay("wrong");
+      }
+      
+      setTimeout(() => {
+        isLocked = false;
+        current++;
+        loadVisualQuestion();
+      }, 800);
+    });
+    
+    visualButtons.appendChild(btn);
+  });
+
+  clearInterval(timer);
+  timeLeft = timeLimit;
+  timer = setInterval(() => {
+    timeLeft--;
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      showOverlay("wrong"); 
+      setTimeout(() => {
+        current++;
+        loadVisualQuestion();
+      }, 500);
+    }
+  }, 1000);
+}
+
+function goNextVisualStage() {
+  if (stage === "easy") { 
+    stage = "medium"; 
+    showVisualStageInstruction(); 
+  } else if (stage === "medium") { 
+    stage = "hard"; 
+    showVisualStageInstruction(); 
+  } else { 
+    showVisualResult(); 
+  }
+}
+
+function showVisualResult() {
+  showScreen(document.querySelector(".result"));
+  
+  const totalScore = visualEasyScore + visualMediumScore + visualHardScore;
+  const accuracy = visualTotalQuestions ? ((totalScore / visualTotalQuestions) * 100).toFixed(1) : 0;
+  
+  document.getElementById("playerScore").innerHTML = `
+    <h2>視覺搜尋 測試完成</h2>
+    易：${visualEasyScore} / 15<br>
+    中：${visualMediumScore} / 10<br>
+    難：${visualHardScore} / 5<br>
+    <b>總得分：${totalScore} / ${visualTotalQuestions} （正確率：${accuracy}%）</b>
+  `;
+  
+  gameScores.visualSearch = totalScore;
+  sendData();
+}
+
+// ==========================================
 // 資料後端傳送 (Google Sheets API)
 // ==========================================
 function sendData() {
-  const name = document.getElementById("name").value.trim();
-  const age = document.getElementById("age").value.trim();
-  const idNumber = document.getElementById("idNumber").value.trim();
-  const MMSE = document.getElementById("MMSE").value.trim();
-  const gender = document.getElementById("gender").value;
-  
   const totalSemantic = easyScore + mediumScore + hardScore; 
   const accuracy = totalQuestionAll ? Number(((totalSemantic / totalQuestionAll) * 100).toFixed(1)) : 0;
   const memoryAccuracy = totalMemoryQuestionAll ? Number(((memoryScore / totalMemoryQuestionAll) * 100).toFixed(1)) : 0;
   
-  const payload = new URLSearchParams({
-    name, age, idNumber, MMSE, gender,
-    easyScore, mediumScore, hardScore, semanticScore: totalSemantic, accuracy,
-    memoryEasy, memoryMedium, memoryHard, memoryScore, memoryAccuracy
-  });
+  const visualAccuracy = visualTotalQuestions ? Number(((gameScores.visualSearch / visualTotalQuestions) * 100).toFixed(1)) : 0;
 
-  // 發送連線
+  const payload = {
+    userId: currentUserId,
+    easyScore: easyScore,
+    mediumScore: mediumScore,
+    hardScore: hardScore,
+    semanticScore: totalSemantic,
+    accuracy: accuracy,
+    memoryEasy: memoryEasy,
+    memoryMedium: memoryMedium,
+    memoryHard: memoryHard,
+    memoryScore: memoryScore,
+    memoryAccuracy: memoryAccuracy,
+    visualEasy: visualEasyScore,
+    visualMedium: visualMediumScore,
+    visualHard: visualHardScore,
+    visualScore: gameScores.visualSearch,
+    visualAccuracy: visualAccuracy
+  };
+
   fetch("https://script.google.com/macros/s/AKfycbxwU-QQT9RHJYTMT9anSbwOUVrFaJ9CTHrq17-76uoxtMb9Fa9HtkExEzPh_q-4Bsz3/exec", {
     method: "POST",
-    body: payload
+    headers: {
+      "Content-Type": "text/plain" 
+    },
+    body: JSON.stringify(payload)
   })
-  .then(() => {
-    console.log("資料已成功發送！請查看雲端試算表當前分頁。");
+  .then(res => res.json())
+  .then((resData) => {
+    if (resData.result === "success") {
+      console.log("資料已成功比對 ID 並填入對應欄位！");
+    } else {
+      console.warn("GAS 警告:", resData.message);
+    }
   })
   .catch(err => console.error("送出失敗:", err));
 }
