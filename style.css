@@ -1,347 +1,171 @@
-/* =======================================================
-   🌟 全域基礎設定 (html, body, app)
-   ======================================================= */
-html, body { 
-    height: 100%;
-    width: 100%; 
-    margin: 0; 
-    padding: 0;
-    overflow-x: hidden; 
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #fcfcfc; 
-} 
+.hidden {
+    display: none !important;
+}
 
-.app { 
-    width: 100%; 
-    min-height: 100vh; 
-    position: relative; 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-} 
-
-/* 最關鍵的隱藏功能 */
-.hidden { 
-    display: none !important; 
-} 
-
-/* =======================================================
-   🧱 畫面基礎結構
-   ======================================================= */
-.screen { 
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center; 
-    align-items: center; 
+body {
+    font-family: "Microsoft JhengHei", Arial, sans-serif;
+    background-color: #f4f7f6;
+    margin: 0;
     padding: 20px;
-    box-sizing: border-box;
-    background-color: #fcfcfc;
-    z-index: 10;
-} 
-
-/* 當畫面沒有被 hidden 時，才啟動 flex 排版 */
-.screen:not(.hidden) {
     display: flex;
-}
-
-/* =======================================================
-   🎯 登入與註冊完全獨立隔離 (全面修正 Google 表單重疊與誤判)
-   ======================================================= */
-
-/* ── 狀態 A：如果正在顯示「註冊表單（包含 Google 表單問卷）」── */
-.screen.login:has(#registerForm:not(.hidden)) #loginForm,
-.screen.login:has(#registerForm:not(.hidden)) .loginTitle:not(#registerForm .loginTitle),
-.screen.login:has(#registerForm:not(.hidden)) #loginButton,
-.screen.login:has(#registerForm:not(.hidden)) .btn-back:not(#registerForm .btn-back),
-.screen.login:has(#registerForm:not(.hidden)) #tabLogin,
-.screen.login:has(#registerForm:not(.hidden)) #tabRegister,
-.screen.login:has(#registerForm:not(.hidden)) #projectName {
-    display: none !important;
-}
-
-/* 註冊表單開啟時，讓內部元件全部垂直對齊，且標題強制置中 */
-.screen.login:has(#registerForm:not(.hidden)) {
-    position: relative !important;
-    height: auto !important;
-    min-height: 100vh !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important; /* 所有東西水平置中 */
-    justify-content: flex-start !important;
-    padding-top: 40px !important;
-    padding-bottom: 60px !important;
-}
-
-/* 確保那個標題「填寫問卷調查」強制置中 */
-.screen.login:has(#registerForm:not(.hidden)) h2,
-.screen.login:has(#registerForm:not(.hidden)) .questionTitle {
-    text-align: center !important;
-    width: 100% !important;
-    margin: 0 auto 20px auto !important;
-    display: block !important;
-}
-
-/* ── 狀態 B：如果正在顯示「登入表單」── */
-.screen.login:has(#loginForm:not(.hidden)) #registerForm,
-.screen.login:has(#loginForm:not(.hidden)) #tabLogin,
-.screen.login:has(#loginForm:not(.hidden)) #tabRegister,
-.screen.login:has(#loginForm:not(.hidden)) #projectName {
-    display: none !important;
-}
-
-/* ── 狀態 C：如果是在「首頁主選單」（登入跟註冊元件都隱藏時，精準隱藏登入按鈕） ── */
-.screen.login:has(#loginForm.hidden):has(#registerForm.hidden) .loginTitle,
-.screen.login:has(#loginForm.hidden):has(#registerForm.hidden) .loginInputs,
-.screen.login:has(#loginForm.hidden):has(#registerForm.hidden) #loginButton,
-.screen.login:has(#loginForm.hidden):has(#registerForm.hidden) .btn-back,
-.screen.login:has(#loginForm.hidden):has(#registerForm.hidden) #registerForm,
-.screen.login:has(#loginForm.hidden):has(#registerForm.hidden) button[type="submit"],
-.screen.login:has(#loginForm.hidden):has(#registerForm.hidden) input[type="submit"] {
-    display: none !important;
-}
-
-/* =======================================================
-   📝 Google 表單（問卷調查）終極放大專區
-   ======================================================= */
-#registerForm {
-    width: 95vw !important;        /* 改用螢幕寬度單位 vw，保證撐開 */
-    max-width: none !important;    /* 徹底解除最大寬度限制 */
-    margin: 0 auto !important;
-}
-
-/* 讓嵌入的 Google 表單強制撐滿 100% 寬度，絕不縮小、絕不窄化 */
-#registerForm iframe, 
-.screen.login iframe {
-    width: 95vw !important;        /* 強制 iframe 寬度 */
-    max-width: 1200px !important;  /* 允許它長到最大 1200px，保證寬敞 */
-    height: 800px !important;
-    margin: 0 auto !important;
-}
-
-/* =======================================================
-   🎮 核心大按鈕家族設定 (全網頁所有標準功能按鈕)
-   ======================================================= */
-#tabLogin, #tabRegister, #loginButton, #registerButton, .btn, .control button, #startButton, #practiceButton, #continueButton, #endButton { 
-    width: 320px !important; 
-    height: 65px !important; 
-    font-size: 26px !important; 
-    font-weight: bold !important;
-    display: flex !important; 
-    justify-content: center !important; 
-    align-items: center !important; 
-    margin: 12px auto !important; 
-    cursor: pointer !important;
-    border-radius: 12px !important;
-    border: 2px solid #bbb !important;
-    background-color: #ffffff !important;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.05) !important;
-    transition: transform 0.1s ease, background-color 0.2s !important;
-} 
-
-#tabLogin:hover, #tabRegister:hover, #loginButton:hover, #registerButton:hover, .btn:hover, #continueButton:hover, #endButton:hover {
-    background-color: #f5f5f5 !important;
-    border-color: #666 !important;
-}
-
-/* =======================================================
-   🏠 首頁與大標題
-   ======================================================= */
-#projectName { 
-    text-align: center; 
-    font-size: 54px; 
-    font-weight: bold;
-    margin-top: 0;
-    margin-bottom: 40px; 
-    width: 100%;
-    color: #222;
-}
-
-/* =======================================================
-   🔑 表單內部文字與輸入框排版
-   ======================================================= */
-.auth-form {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-}
-
-.loginTitle { 
-    font-size: 44px; 
-    font-weight: bold;
-    margin-top: 20px !important;
-    margin-bottom: 30px !important; 
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
     color: #333;
-    text-align: center;
+}
+
+.app {
     width: 100%;
-} 
-
-#registerForm h3 {
-    font-size: 40px !important; /* 👈 問卷標題再放大，更顯眼 */
-    font-weight: bold !important;
-    margin-top: 25px !important;
-    margin-bottom: 25px !important;
+    max-width: 600px;
+    background: transparent; 
+    padding: 0;
+    box-shadow: none;
     text-align: center;
 }
 
-.loginInputs { 
-    display: flex !important; 
-    flex-direction: column !important; 
-    align-items: center !important; 
-    gap: 15px !important; 
-    margin-bottom: 15px !important;
-    width: 100% !important;
-} 
-
-.loginInputs input, .loginInputs select { 
-    width: 320px !important; 
-    height: 60px !important; 
-    font-size: 24px !important; 
-    box-sizing: border-box !important; 
-    padding: 12px 20px !important;
-    border: 2px solid #ccc !important;
-    border-radius: 12px !important;
-    background-color: #ffffff !important;
-} 
-
-.btn-back {
-    background-color: #f1f1f1 !important;
-    border-color: #ccc !important;
-    color: #555 !important;
-    box-shadow: none !important;
-}
-
-/* =======================================================
-   🎮 遊戲中與其他功能設定 (保持完美不變)
-   ======================================================= */
-#progress, .game-progress {
-    position: relative; 
-    margin-top: 10px;   
-    margin-bottom: 25px;
-    font-size: 28px;    
+.button {
+    font-size: 22px !important;
     font-weight: bold;
+    padding: 15px 30px;
+    margin: 10px auto;
+    border-radius: 12px;
+    border: 2px solid #ccc;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: block;
+    width: 80%;
+    max-width: 350px;
+}
+
+.button:hover {
+    background-color: #e2e6ea;
+    border-color: #007bff;
+}
+
+h1 {
+    font-size: 38px !important;
+    margin-bottom: 25px;
+    color: #2c3e50;
+}
+
+h2, .gameTitle, .loginTitle, .registerTitle {
+    font-size: 32px !important;
+    margin-bottom: 20px;
+    color: #34495e;
+}
+
+/* 拿掉說明文字的白色背景與陰影框 */
+h3, .instructionText {
+    font-size: 22px !important;
+    line-height: 1.6;
+    color: #555;
+    text-align: left;
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+    margin-bottom: 20px;
+}
+
+input {
+    width: 80%;
+    font-size: 20px !important;
+    padding: 12px;
+    margin: 10px 0;
+    border: 2px solid #ccc;
+    border-radius: 8px;
     text-align: center;
-    width: 100%;
+    background: #fff;
 }
 
 .gameArea {
-    display: flex;
-    flex-direction: column; 
-    align-items: center;
-    justify-content: flex-start; 
+    text-align: center;
 }
 
-.buttons button { 
-    border: 3px solid #ccc !important; 
-    background: white !important; 
-    padding: 10px !important; 
-    cursor: pointer !important; 
-    width: 14vh !important; 
-    height: 14vh !important; 
-    border-radius: 12px !important;
-} 
-.buttons button.text-mode-btn { font-size: 4.5vh !important; font-weight: bold !important; color: #333 !important; }
-.buttons button:hover { border-color: #4CAF50 !important; } 
-.buttons img { width: 95%; height: 95%; object-fit: contain; } 
-.buttons-grid {
+#gameTempo {
+    font-size: 24px !important;
+    font-weight: bold;
+    color: #d9534f;
+    margin-bottom: 15px;
+}
+
+#questionInstruction {
+    font-size: 24px !important;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 20px;
+}
+
+.buttons {
     display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(20vh, 1fr)) !important;
-    gap: 20px !important;
-    justify-content: center !important;
-    align-content: center !important;
-    width: 100% !important;
-    max-width: 60vh !important; /* 限制寬度讓它留在中間 */
-    margin: 0 auto !important;  /* 關鍵：水平置中 */
-}
-
-.screen.memoryArea *:not(.keypad button):not(#memoryDisplay) { font-size: 36px; font-weight: bold; line-height: 1.6; color: #222; }
-.screen.memoryArea div:not(.keypad):not(#memoryDisplay), .screen.memoryArea span { font-size: 48px; }
-
-#gameTitle h2, .gameArea h2, .screen h2:not(.loginTitle) { font-size: 50px; font-weight: bold; margin-bottom: 25px; }
-#playerScore { font-size: 28px; line-height: 1.8; }
-#playerScore h2 { font-size: 46px; }
-
-input.error, select.error { border-color: red; } 
-.error { color: red; font-size: 18px; width: 320px; text-align: left; margin-bottom: 5px; } 
-.control { display: flex; justify-content: center; gap: 15px; align-items: center; flex-direction: column; } 
-.instructions { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 16px; } 
-#instructionText { max-width: 600px; line-height: 1.6; font-size: 26px; } 
-
-.screen.memoryArea { height: 100vh; width: 100vw; } 
-#memoryDisplay { font-size: 9vh !important; font-weight: 800 !important; color: #007bff !important; background: #f8f9fa; width: 90%; max-width: 450px; height: 14vh; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 2px dashed #ddd; margin-bottom: 20px; }
-.keypad { display: grid; grid-template-columns: repeat(3, 11vh); gap: 1.5vh; justify-content: center; } 
-.keypad button { width: 11vh !important; height: 9vh !important; font-size: 3.5vh !important; font-weight: bold !important; border-radius: 12px; background-color: white; border: 1px solid #ccc; }
-
-.overlay { position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; font-size: 150px !important; font-weight: bold !important; z-index: 9999 !important; text-shadow: 2px 2px 10px rgba(0,0,0,0.1) !important; }
-.overlay.correct { color: #00c853 !important; }
-.overlay.wrong { color: #ff1744 !important; }
-
-/* =======================================================
-   🎯 鎖定封殺：只有在登入表單開啟時才顯示「確認登入」
-   ======================================================= */
-
-/* 1. 預設隱藏：只要是在首頁或註冊頁面，這個按鈕全部強制消失 */
-#btnSubmitLogin {
-    display: none !important;
-}
-
-/* 2. 只有當 #loginForm 真的被顯示出來時，才解除封鎖 */
-.screen.login:has(#loginForm:not(.hidden)) #btnSubmitLogin {
-    display: flex !important;
-}
-
-/* =======================================================
-   🎮 核心調整：語意 (gameArea) 與 視覺搜尋 (visualArea) 分離
-   ======================================================= */
-
-/* 1. 語意題專用 (gameArea) */
-.gameArea .buttons { 
-    display: grid !important; 
-    gap: 40px !important; 
-    width: 90% !important; 
-    margin-top: 30px !important; 
-    justify-items: center; 
-}
-.gameArea .buttons button { 
-    width: 25vh !important; 
-    height: 25vh !important; 
-    border-radius: 20px !important; 
-    border: 3px solid #ccc !important; 
-    background: white !important; 
-}
-
-/* 2. 視覺搜尋專用 (visualArea) - 新增獨立區塊 */
-.visualArea .buttons { 
-    display: grid !important; 
-    grid-template-columns: repeat(4, 1fr) !important; 
-    gap: 15px !important; 
-    
-    /* 關鍵修改：限制最大寬度並置中，不要讓它撐滿螢幕 */
-    width: 60vh !important; 
-    margin: 20px auto !important; 
-    
+    gap: 15px !important;
+    justify-content: center;
     justify-items: center;
+    margin: 20px auto;
+}
+
+.buttons.grid-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    max-width: 340px;
+}
+
+/* 6 張圖時：強制 3 個一排 (上面 3 個、下面 3 個) */
+.buttons.grid-6 {
+    grid-template-columns: repeat(3, 1fr) !important;
+    max-width: 520px;
+}
+
+/* 選項按鈕大小（從 120px 放大到 150px） */
+.buttons .button {
+    width: 150px;
+    height: 150px;
+    padding: 10px !important;
+    display: flex;
+    justify-content: center;
     align-items: center;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    margin: 0;
 }
 
-.visualArea .buttons button { 
-    /* 稍微放大按鈕，提升長輩的操作體驗 */
-    width: 12vh !important; 
-    height: 12vh !important; 
-    font-size: 6vh !important; /* 字體跟著變大 */
-    border-radius: 12px !important; 
-    border: 3px solid #ccc !important; 
-    background: white !important; 
+/* 內部的圖片大小（從 95px 放大到 125px） */
+.buttons img {
+    width: 125px !important;
+    height: 125px !important;
+    object-fit: contain;
 }
 
-/* 3. 按鈕通用樣式 */
-.buttons button { cursor: pointer !important; display: flex !important; justify-content: center !important; align-items: center !important; transition: all 0.2s ease !important; }
-.buttons button:hover { transform: scale(1.05); border-color: #4CAF50 !important; }
-.buttons button img { width: 90%; height: 90%; object-fit: contain; }
+/* 提示訊息彈窗 (純大字與圖示，無框) */
+#feedbackOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+#feedbackContent {
+    background: transparent;
+    padding: 20px;
+    text-align: center;
+}
+
+#feedbackIcon {
+    font-size: 140px !important;
+    font-weight: bold;
+    line-height: 1;
+    margin-bottom: 10px;
+}
+
+#feedbackText {
+    font-size: 36px !important;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+}

@@ -1,125 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class = "app">
+<html lang="zh-TW">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>高齡者大腦體操</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
 
-        <div class="screen login">
-            <!-- 1. 遊戲首頁：預設只顯示名稱與這兩個大按鈕 -->
-            <div class="main-menu-container">
-                <h1 id="projectName">高齡者大腦體操</h1>
-                <button id="tabLogin" class="btn">登入帳號</button>
-                <button id="tabRegister" class="btn">註冊帳號</button> 
-            </div>
-
-            <!-- 2. 登入表單畫面：點擊登入後，大按鈕消失，這裡獨立在中央漂亮顯示 -->
-            <form id="loginForm" class="auth-form hidden">
-                <h2 class="loginTitle">會員登入</h2>
-                <div class="loginInputs">
-                    <input type="text" id="loginAccount" placeholder="請輸入帳號" required>
-                    <input type="password" id="loginPassword" placeholder="請輸入密碼" required>
+    <body>
+        <div class="app">
+            <div class="login">
+                <div class="first screen">
+                    <h1 id="gameName">高齡者大腦體操</h1>
+                    <button class="button" id="loginAccount">登入</button>
+                    <button class="button" id="registerAccount">註冊</button>
                 </div>
-                <button type="button" id="btnSubmitLogin" class="btn">確認登入</button>
-                <button type="button" class="btn btn-back" onclick="backToMainMenu()">返回主選單</button>
-            </form>
 
-            <!-- 3. 註冊表單畫面：點擊註冊後顯示 -->
-            <form id="registerForm" class="auth-form hidden">
-                <h2 class="loginTitle">建立新帳號</h2>
-                <div class="loginInputs">
-                    <input type="text" id="regAccount" placeholder="請設定帳號" required>
-                    <input type="password" id="regPassword" placeholder="請設定密碼" required>
+                <form class="second screen login hidden" id="loginForm">
+                    <h2 class="loginTitle">用戶登入</h2>
+                    <div class="loginInputs">
+                        <input type="text" id="logAccount" placeholder="請輸入帳號" required><br>
+                        <input type="password" id="logPassword" placeholder="請輸入密碼" required>
+                    </div>
+                    <button type="button" class="button" id="logSubmitButton">登入</button>
+                    <button type="button" class="back button">返回首頁</button>
+                </form>
+
+                <form class="second screen register hidden" id="registerForm">
+                    <h2 class="registerTitle">註冊新用戶</h2>
+                    <div class="registerInputs">
+                        <input type="text" id="regAccount" placeholder="請設定遊戲帳號" required><br>
+                        <input type="password" id="regPassword" placeholder="請設定遊戲密碼" required><br>
+                        <input type="number" id="age" placeholder="請輸入玩家年齡" min="1" max="120" required>
+                    </div>
+                    <button type="button" class="button" id="regSubmitButton">註冊</button>
+                    <button type="button" class="back button">返回首頁</button>
+                </form>
+            </div>
+
+            <!-- 主選單：改為垂直一條線排列 -->
+            <div class="third screen hidden" style="display: flex; flex-direction: column; align-items: center;">
+                <button class="button" id="btnSemantic">找出不合群</button>
+                <button class="button" id="btnMemory">數字點點名</button>
+                <button class="button" id="btnVisualSearch">抓出冒牌貨</button>
+                <button class="button" id="btnSpatial">圖形轉轉樂</button>
+                <button class="button" id="btnMultitasking">顏色方向王</button>
+                <button class="button back" id="backToHomeFromMenu">返回首頁</button>
+            </div>
+
+            <div class="fourth screen hidden" id="semBeginning">
+                <h2 class="gameTitle" id="semTitle">找出不合群</h2>
+                <h3 class="instructionText" id="semInstructionText">
+                    遊戲說明：<br>
+                    本遊戲分為易, 中, 難三個等級，各等級皆有五題，共15題，限時一分鐘！<br><br>
+                    <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
+                        <button class="button" id="semEasy" style="margin:0; padding: 10px 20px; font-size: 18px !important;">易等級說明</button>
+                        <button class="button" id="semMedium" style="margin:0; padding: 10px 20px; font-size: 18px !important;">中等級說明</button>
+                        <button class="button" id="semHard" style="margin:0; padding: 10px 20px; font-size: 18px !important;">難等級說明</button>
+                    </div>
+                    以下試玩將以易等級做出題，可重複試玩，熟悉後即可開始正式遊戲！<br>
+                </h3>
+                <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 10px;">
+                    <button class="button" id="trySem" style="margin: 0; width: 40%; max-width: 200px;">試玩</button>
+                    <button class="button" id="startSem" style="margin: 0; width: 40%; max-width: 200px; background-color: #007bff; color: white;">開始遊戲</button>
                 </div>
-                <hr>
-                <div class="form-container">
-                    <h2>填寫問卷調查</h2>
-                    <iframe
-                        id="google-form-iframe"
-                        src="" 
-                        width="100%" 
-                        height="450" 
-                        frameborder="0" 
-                        marginheight="0" 
-                        marginwidth="0">
-                        載入中…
-                    </iframe>
+                <button class="button back" id="backToMenuFromSem">返回選單</button>
+            </div>
+
+            <div class="gameArea screen hidden">
+                <div id="gameTempo">
+                    剩餘時間: <span id="timeLeft">60</span> 秒 | 進度: <span id="progressText">1/15</span>
                 </div>
-                <button type="button" id="btnSubmitRegister" class="btn">註冊完成</button>
-                <button type="button" class="btn btn-back" onclick="backToMainMenu()">返回主選單</button>
-            </form>
-        </div>
-    
-        <div class = "screen control hidden">
-            <button class="btn" id = "btnSemantic">找出不合群</button>
-            <button class="btn" id = "btnMemory">數字點點名</button>
-            <button class="btn" id = "btnVisualSearch">抓出冒牌貨</button>
-            <button class="btn" id = "btnSpatial">圖形轉轉樂</button>
-            <button class="btn" id = "btnSwitching">加減方向王</button>
-        </div>
+                <div id="questionInstruction"></div>
+                <div class="buttons"></div>
+                
+                <!-- 按鈕順序對調：返回說明在左，確認答案在右 -->
+                <div style="margin-top: 20px; display: flex; justify-content: center; gap: 15px;">
+                    <button class="button" id="backToSemBeginningBtn">返回遊戲說明</button>
+                    <button class="button" id="confirmAnswerBtn" style="background-color: #007bff; color: white;">確認答案</button>
+                </div>
+                
+                <!-- 提示與訊息彈窗 (無背景框純圖示/文字放大) -->
+                <div id="feedbackOverlay">
+                    <div id="feedbackContent">
+                        <div id="feedbackIcon"></div>
+                        <div id="feedbackText"></div>
+                        <button class="button" id="customAlertBtn" style="display: none; margin-top: 20px; background-color: #007bff; color: white;">確定</button>
+                    </div>
+                </div>
 
-        <div class = "screen instructions hidden">
-
-            <div id = "gameTitle" class="hidden"></div>
-
-            <div id = "instructionText" class="hidden"></div>
-
-            <div class="buttonType hidden">
-                <button class="btn" id = "picture">圖片題</button>
-                <button class="btn" id = "character">文字題</button>
-            </div>
-        
-            <div class="buttonGroup hidden">
-                <button class="btn" id = "practiceButton">試玩</button>
-                <button class="btn" id = "startButton">開始遊戲</button>
-            </div>
-        </div>
-
-        <div class="screen gameArea hidden">
-            <div id = "progress"></div>
-            <div class="buttons"></div>
-            <div id="overlayContainer"></div>
-            <div id="result"></div>
-        </div>
-    
-        <div class="screen result hidden">
-            <div id="playerScore"></div>
-
-            <button id="continueButton">繼續遊玩</button>
-            <button id="endButton">結束遊玩</button>
-
-            <canvas id="radarChart"></canvas>
-        </div>
-
-        <div class=" screen memoryArea hidden">
-
-            <div id="memoryDisplay"></div>
-            <div id="memoryInstruction"></div>
-
-            <div id="memoryInput"></div>
-
-            <div class="keypad">
-                <button>1</button><button>2</button><button>3</button>
-                <button>4</button><button>5</button><button>6</button>
-                <button>7</button><button>8</button><button>9</button>
-                <button>⌫</button><button>0</button><button>✔</button>
+                <div id="overlayContainer"></div>
+                <div id="result"></div>
             </div>
 
-            <div id="memoryResult"></div>
-        </div>
-        
-        <div class="screen visualArea hidden">
-            <div id="visualProgress"></div>
-            <div id="visualButtons" class="buttons"></div>
-            <div id="visualOverlayContainer"></div>
+            <div class="scoreScreen screen hidden" style="text-align: center; padding: 20px;">
+                <h2>遊戲結算</h2>
+                <div id="finalScoreDetails" style="font-size: 22px; line-height: 1.8; margin: 20px 0;"></div>
+                <button class="button" id="backToMenuFromScore">返回主選單</button>
+            </div>
         </div>
 
-    </div>
-    
-    <script src="script.js"></script>
-</body>
+        <script src="script.js"></script>
+    </body>
 </html>
