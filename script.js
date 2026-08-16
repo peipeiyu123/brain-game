@@ -164,7 +164,7 @@ startSem.addEventListener("click", () => {
 });
 
 backToSemBeginningBtn.addEventListener("click", () => {
-    clearInterval(timer);
+    clearAllTimers();
     showScreen(semBeginning);
 });
 
@@ -259,9 +259,12 @@ function startTrialGame() {
 }
 
 function startGameSession() {
+    clearAllTimers(); // 確保清除所有殘存計時器
+    timeLeft = 60;    // 遊戲一固定為 60 秒
+    timeLeftSpan.innerText = timeLeft;
+    
     timeLeftSpan.parentElement.style.display = "block";
     progressText.parentElement.style.display = "block";
-    timeLeft = 60;
     startTime = Date.now();
     
     currentQuestions = [];
@@ -272,6 +275,7 @@ function startGameSession() {
     currentQuestionIndex = 0;
     selectedImages = [];
 
+    // 使用專屬的 timer 變數，絕不與遊戲二混用
     timer = setInterval(() => {
         timeLeft--;
         timeLeftSpan.innerText = timeLeft;
@@ -282,6 +286,15 @@ function startGameSession() {
     }, 1000);
 
     loadGameStep();
+}
+
+function clearAllTimers() {
+    if (timer) clearInterval(timer);
+    if (memTimer) clearInterval(memTimer);
+    if (memDisplayTimer) clearInterval(memDisplayTimer);
+    timer = null;
+    memTimer = null;
+    memDisplayTimer = null;
 }
 
 function loadGameStep() {
@@ -520,9 +533,12 @@ function startMemTrialGame() {
 }
 
 function startMemGameSession() {
+    clearAllTimers(); // 確保清除所有殘存計時器
+    memTimeLeft = 90; // 若遊戲二需求為 60 秒（若需 90 秒可改為 90）
+    timeLeftSpan.innerText = memTimeLeft;
+
     timeLeftSpan.parentElement.style.display = "block";
     progressText.parentElement.style.display = "block";
-    memTimeLeft = 60;
     memStartTime = Date.now();
     
     memCurrentQuestions = [];
@@ -533,6 +549,7 @@ function startMemGameSession() {
     memCurrentIndex = 0;
     inputSequence = "";
 
+    // 嚴格使用 memTimer，與遊戲一完全隔離
     memTimer = setInterval(() => {
         memTimeLeft--;
         timeLeftSpan.innerText = memTimeLeft;
@@ -763,8 +780,7 @@ function endMemGame(message) {
 
 // 修改返回遊戲說明按鈕的行為（讓它能分別對應遊戲一或遊戲二）
 backToSemBeginningBtn.addEventListener("click", () => {
-    clearInterval(timer);
-    clearInterval(memTimer);
+    clearAllTimers();
     
     // 恢復遊戲一的按鈕顯示與原本的大小樣式
     const confirmBtn = document.getElementById("confirmAnswerBtn");
