@@ -110,12 +110,12 @@ regSubmitButton.addEventListener("click", () => {
     const age = document.getElementById("age").value.trim();
 
     if (!account || !password || !age) {
-        alert("請填寫帳號、密碼與年齡！");
+        showCustomAlert("請填寫帳號、密碼與年齡！");
         return;
     }
 
     sendJsonpRequest("register", account, password, age, "regCallback", (result) => {
-        alert(result.message);
+        showCustomAlert(result.message);
         if (result.status === "success") showScreen(firstScreen);
     });
 });
@@ -125,21 +125,27 @@ logSubmitButton.addEventListener("click", () => {
     const password = document.getElementById("logPassword").value.trim();
 
     if (!account || !password) {
-        alert("請填寫帳號與密碼！");
+        showCustomAlert("請填寫帳號與密碼！");
         return;
     }
 
     sendJsonpRequest("login", account, password, null, "logCallback", (result) => {
-        alert(result.message);
+        showCustomAlert(result.message);
         if (result.status === "success") showScreen(thirdScreen);
     });
 });
 
 btnSemantic.addEventListener("click", () => showScreen(semBeginning));
 
-semEasy.addEventListener("click", () => alert("易等級：4張圖片中選1張不同類別的圖片。"));
-semMedium.addEventListener("click", () => alert("中等級：6張圖片中選1張不同類別的圖片。"));
-semHard.addEventListener("click", () => alert("難等級：6張圖片中選2張不同類別的圖片。"));
+semEasy.addEventListener("click", () => {
+    showCustomAlert("【易等級說明】<br>4 張圖片中選 1 張不同類別的圖片。");
+});
+semMedium.addEventListener("click", () => {
+    showCustomAlert("【中等等級說明】<br>6 張圖片中選 1 張不同類別的圖片。");
+});
+semHard.addEventListener("click", () => {
+    showCustomAlert("【難等級說明】<br>6 張圖片中選 2 張不同類別的圖片。");
+});
 
 trySem.addEventListener("click", () => {
     tryMode = true;
@@ -352,7 +358,7 @@ confirmAnswerBtn.addEventListener("click", () => {
     let requiredCount = (q.difficulty === "hard") ? 2 : 1;
 
     if (selectedImages.length < requiredCount) {
-        alert(`請選擇 ${requiredCount} 張圖片！`);
+        showCustomAlert(`請選擇 ${requiredCount} 張圖片！`);
         return;
     }
 
@@ -414,9 +420,15 @@ backToMenuFromScore.addEventListener("click", () => {
 btnMemory.addEventListener("click", () => showScreen(memBeginning));
 backToMenuFromMem.addEventListener("click", () => showScreen(thirdScreen));
 
-memEasy.addEventListener("click", () => alert("易等級：隨機出現 3 個數字，依指示正背或逆背。"));
-memMedium.addEventListener("click", () => alert("中等級：隨機出現 4 個數字，依指示正背或逆背。"));
-memHard.addEventListener("click", () => alert("難等級：隨機出現 5 個數字，依指示正背或逆背。"));
+memEasy.addEventListener("click", () => {
+    showCustomAlert("【易等級說明】<br>隨機出現 3 個數字，依指示正背（由左到右）。");
+});
+memMedium.addEventListener("click", () => {
+    showCustomAlert("【中等等級說明】<br>隨機出現 4 個數字，依指示正背（由左到右）。");
+});
+memHard.addEventListener("click", () => {
+    showCustomAlert("【難等級說明】<br>隨機出現 4 個數字，依指示逆背（由右到左）。");
+});
 
 // 在點擊「試玩」或「開始遊戲」時，隱藏下方確認按鈕並讓返回按鈕置中
 tryMem.addEventListener("click", () => {
@@ -696,7 +708,7 @@ function handleKeypadInput(key) {
 // 檢查遊戲二答案
 function checkMemAnswer() {
     if (!inputSequence) {
-        alert("請先輸入數字！");
+        showCustomAlert("請先輸入數字！");
         return;
     }
 
@@ -772,3 +784,41 @@ backToSemBeginningBtn.addEventListener("click", () => {
         showScreen(memBeginning);
     }
 });
+
+function showCustomAlert(message) {
+    let overlay = document.getElementById("feedbackOverlay");
+    if (!overlay) return;
+
+    // 動態建立大字、大按鈕的自定義彈窗，確保高齡者看得清楚且點得到
+    overlay.innerHTML = `
+        <div style="background: #ffffff; padding: 40px; border-radius: 20px; max-width: 85%; width: 500px; margin: auto; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.3); border: 4px solid #007bff;">
+            <div style="font-size: 28px; color: #333333; line-height: 1.6; margin-bottom: 30px; font-weight: bold;">
+                ${message}
+            </div>
+            <button id="tempAlertBtn" class="button" style="background-color: #007bff; color: white; width: 180px; margin: 0 auto; display: inline-block; cursor: pointer; font-size: 24px !important; padding: 12px 20px; border-radius: 12px; border: none;">
+                確定
+            </button>
+        </div>
+    `;
+
+    // 顯示遮罩並置於最高層級
+    overlay.style.display = "flex";
+    overlay.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
+    overlay.style.zIndex = "99999";
+
+    // 綁定「確定」按鈕點擊事件，點擊後關閉並還原畫面
+    let btn = document.getElementById("tempAlertBtn");
+    if (btn) {
+        btn.onclick = () => {
+            overlay.style.display = "none";
+            // 還原原本 feedback 的結構，避免影響後續答對/答錯的判定
+            overlay.innerHTML = `
+                <div id="feedbackContent">
+                    <div id="feedbackIcon"></div>
+                    <div id="feedbackText"></div>
+                    <button class="button" id="customAlertBtn" style="display: none; margin-top: 20px; background-color: #007bff; color: white;">確定</button>
+                </div>
+            `;
+        };
+    }
+}
