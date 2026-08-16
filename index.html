@@ -93,6 +93,26 @@
                 <div id="result"></div>
             </div>
 
+            <!-- 遊戲二開始畫面 (數字點點名) -->
+            <div class="fourth screen hidden" id="memBeginning">
+                <h2 class="gameTitle" id="memTitle">數字點點名</h2>
+                <h3 class="instructionText" id="memInstructionText">
+                    遊戲說明：<br>
+                    本遊戲分為易, 中, 難三個等級，各等級皆有五題，共15題，限時一分鐘！<br><br>
+                    <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
+                        <button class="button" id="memEasy" style="margin:0; padding: 10px 20px; font-size: 18px !important;">易等級說明</button>
+                        <button class="button" id="memMedium" style="margin:0; padding: 10px 20px; font-size: 18px !important;">中等級說明</button>
+                        <button class="button" id="memHard" style="margin:0; padding: 10px 20px; font-size: 18px !important;">難等級說明</button>
+                    </div>
+                    以下試玩將以易等級做出題，可重複試玩，熟悉後即可開始正式遊戲！<br>
+                </h3>
+                <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 10px;">
+                    <button class="button" id="tryMem" style="margin: 0; width: 40%; max-width: 200px;">試玩</button>
+                    <button class="button" id="startMem" style="margin: 0; width: 40%; max-width: 200px; background-color: #007bff; color: white;">開始遊戲</button>
+                </div>
+                <button class="button back" id="backToMenuFromMem">返回選單</button>
+            </div>
+
             <div class="scoreScreen screen hidden" style="text-align: center; padding: 20px;">
                 <h2>遊戲結算</h2>
                 <div id="finalScoreDetails" style="font-size: 22px; line-height: 1.8; margin: 20px 0;"></div>

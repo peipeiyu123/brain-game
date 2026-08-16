@@ -50,6 +50,15 @@ const images = {
     }
 };
 
+const btnMemory = document.getElementById("btnMemory");
+const memBeginning = document.getElementById("memBeginning");
+const memEasy = document.getElementById("memEasy");
+const memMedium = document.getElementById("memMedium");
+const memHard = document.getElementById("memHard");
+const tryMem = document.getElementById("tryMem");
+const startMem = document.getElementById("startMem");
+const backToMenuFromMem = document.getElementById("backToMenuFromMem");
+
 let tryMode = false;
 let currentQuestions = [];
 let currentQuestionIndex = 0;
@@ -60,6 +69,18 @@ let timer = null;
 let timeLeft = 60;
 let startTime = 0;
 let selectedImages = [];
+
+let memTryMode = false;
+let memCurrentQuestions = [];
+let memCurrentIndex = 0;
+let memStage = "easy";
+let memScore = { easy: 0, medium: 0, hard: 0 };
+let memTimer = null;
+let memTimeLeft = 60;
+let memStartTime = 0;
+let targetSequence = []; // 正確答案字串
+let inputSequence = "";  // 玩家輸入的字串
+let memDisplayTimer = null;
 
 function showScreen(screen) {
     document.querySelectorAll(".screen").forEach(s => s.classList.add("hidden"));
@@ -388,4 +409,353 @@ function endGame(message) {
 
 backToMenuFromScore.addEventListener("click", () => {
     showScreen(thirdScreen);
+});
+
+btnMemory.addEventListener("click", () => showScreen(memBeginning));
+backToMenuFromMem.addEventListener("click", () => showScreen(thirdScreen));
+
+memEasy.addEventListener("click", () => alert("易等級：隨機出現 3 個數字，依指示正背或逆背。"));
+memMedium.addEventListener("click", () => alert("中等級：隨機出現 4 個數字，依指示正背或逆背。"));
+memHard.addEventListener("click", () => alert("難等級：隨機出現 5 個數字，依指示正背或逆背。"));
+
+// 在點擊「試玩」或「開始遊戲」時，隱藏下方確認按鈕並讓返回按鈕置中
+tryMem.addEventListener("click", () => {
+    memTryMode = true;
+    showScreen(gameArea);
+    setupMemGameLayout(); // 呼叫專屬遊戲二的排版設定
+    startMemTrialGame();
+});
+
+startMem.addEventListener("click", () => {
+    memTryMode = false;
+    memScore = { easy: 0, medium: 0, hard: 0 };
+    showScreen(gameArea);
+    setupMemGameLayout(); // 呼叫專屬遊戲二的排版設定
+    startMemGameSession();
+});
+
+// 專屬遊戲二的排版調整函式
+function setupMemGameLayout() {
+    const confirmBtn = document.getElementById("confirmAnswerBtn");
+    const backBtn = document.getElementById("backToSemBeginningBtn");
+    
+    if (confirmBtn) {
+        confirmBtn.style.display = "none"; // 遊戲二隱藏下方確認按鈕
+    }
+    if (backBtn) {
+        backBtn.style.display = "inline-block";
+        backBtn.style.width = ""; // 不要寫死，讓它保持預設大小
+        backBtn.style.margin = "";
+    }
+    
+    // 讓下方按鈕區域整體置中
+    const btnContainer = backBtn ? backBtn.parentElement : null;
+    if (btnContainer) {
+        btnContainer.style.display = "flex";
+        btnContainer.style.justifyContent = "center";
+    }
+}
+
+// 產生遊戲二題目
+function generateMemQuestion(diff) {
+    let length = 3;
+    if (diff === "medium") length = 4;
+    if (diff === "hard") length = 5;
+
+    // 隨機產生指定長度的數字 (0-9)
+    let numbers = [];
+    for (let i = 0; i < length; i++) {
+        numbers.push(Math.floor(Math.random() * 10));
+    }
+
+    // 隨機決定正背 (forward: 依原順序) 或是 逆背 (backward: 反向順序)
+    let isBackward = Math.random() > 0.5;
+    let modeText = isBackward ? "逆背（由右到左）" : "正背（由左到右）";
+    
+    let ansStr = "";
+    if (isBackward) {
+        ansStr = [...numbers].reverse().join("");
+    } else {
+        ansStr = numbers.join("");
+    }
+
+    return {
+        numbersText: numbers.join(" "),
+        modeText: modeText,
+        answer: ansStr,
+        difficulty: diff
+    };
+}
+
+function startMemTrialGame() {
+    clearInterval(memTimer);
+    timeLeftSpan.parentElement.style.display = "none";
+    progressText.parentElement.style.display = "none";
+    questionInstruction.innerText = "【數字點點名 - 試玩模式】";
+    
+    memCurrentQuestions = [generateMemQuestion("easy")];
+    memCurrentIndex = 0;
+    inputSequence = "";
+    renderMemGameScreen();
+}
+
+function startMemGameSession() {
+    timeLeftSpan.parentElement.style.display = "block";
+    progressText.parentElement.style.display = "block";
+    memTimeLeft = 60;
+    memStartTime = Date.now();
+    
+    memCurrentQuestions = [];
+    for (let i = 0; i < 5; i++) memCurrentQuestions.push(generateMemQuestion("easy"));
+    for (let i = 0; i < 5; i++) memCurrentQuestions.push(generateMemQuestion("medium"));
+    for (let i = 0; i < 5; i++) memCurrentQuestions.push(generateMemQuestion("hard"));
+
+    memCurrentIndex = 0;
+    inputSequence = "";
+
+    memTimer = setInterval(() => {
+        memTimeLeft--;
+        timeLeftSpan.innerText = memTimeLeft;
+        if (memTimeLeft <= 0) {
+            clearInterval(memTimer);
+            endMemGame("時間到！遊戲結束");
+        }
+    }, 1000);
+
+    loadMemGameStep();
+}
+
+function loadMemGameStep() {
+    if (memCurrentIndex >= memCurrentQuestions.length) {
+        clearInterval(memTimer);
+        endMemGame("恭喜完成所有題目！");
+        return;
+    }
+
+    progressText.innerText = `${memCurrentIndex + 1} / 15`;
+    inputSequence = "";
+    renderMemGameScreen();
+}
+
+function renderMemGameScreen() {
+    let q = memCurrentQuestions[memCurrentIndex];
+    targetSequence = q.answer;
+
+    if (memDisplayTimer) {
+        clearInterval(memDisplayTimer);
+    }
+
+    let displayDuration = 2;
+    if (q.difficulty === "medium") displayDuration = 3;
+    if (q.difficulty === "hard") displayDuration = 4;
+
+    let diffTitle = q.difficulty === "easy" ? "簡單等級" : (q.difficulty === "medium" ? "中等等級" : "困難等級");
+    
+    questionInstruction.innerHTML = `
+        <div style="text-align: center; margin-top: 10px;">
+            <div style="font-size: 22px; color: #0066cc; margin-bottom: 10px;">
+                【${diffTitle}】 請記憶以下數字（ <span id="countdownTimer" style="color: #d9534f; font-weight: bold;">${displayDuration}</span> 秒後隱藏數字 ）：
+            </div>
+            
+            <div id="numberPool" style="font-size: 48px; color: #d9534f; letter-spacing: 15px; margin: 15px 0; height: 60px; display: flex; justify-content: center; align-items: center; visibility: visible;">
+                ${q.numbersText}
+            </div>
+            
+            <div style="font-size: 24px; color: #333; margin-bottom: 30px;">
+                作答指示：${q.modeText}
+            </div>
+            
+            <div style="font-size: 26px; color: #007bff; margin-bottom: 25px;">
+                您的輸入： <span id="inputDisplay" style="color: #007bff; border-bottom: 2px solid #007bff; padding: 0 15px; display: inline-block; min-width: 60px; text-align: center; height: 35px;">${inputSequence || ""}</span>
+            </div>
+        </div>
+    `;
+
+    buttons.className = "buttons mem-keypad";
+    buttons.style.display = "grid";
+    buttons.style.gridTemplateColumns = "repeat(3, 1fr)";
+    buttons.style.gap = "15px";
+    buttons.style.maxWidth = "320px";
+    buttons.style.margin = "0 auto";
+    buttons.innerHTML = "";
+
+    // 建立 11 鍵盤 + 右下角「確認」
+    let keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "⌫", "0", "確認"];
+
+    let keypadButtons = [];
+    keys.forEach(key => {
+        const btn = document.createElement("button");
+        btn.className = "button";
+        btn.style.width = "100%";
+        btn.style.height = "75px";
+        btn.style.margin = "0";
+        btn.style.fontSize = key === "確認" ? "22px" : "28px";
+        btn.style.fontWeight = "bold";
+        
+        if (key === "確認") {
+            btn.style.backgroundColor = "#007bff";
+            btn.style.color = "#ffffff";
+        } else {
+            btn.style.backgroundColor = "#ffffff";
+            btn.style.color = "#000000";
+        }
+
+        btn.style.border = "none";
+        btn.style.borderRadius = "15px";
+        btn.style.boxShadow = "0 4px 6px rgba(0,0,0,0.1)";
+        btn.style.display = "flex";
+        btn.style.justifyContent = "center";
+        btn.style.alignItems = "center";
+        btn.style.cursor = "pointer";
+        
+        btn.disabled = true;
+        btn.style.opacity = "0.5";
+
+        btn.innerText = key;
+
+        btn.addEventListener("click", () => {
+            if (!btn.disabled) {
+                handleKeypadInput(key);
+            }
+        });
+
+        buttons.appendChild(btn);
+        keypadButtons.push(btn);
+    });
+
+    // 處理下方大型按鈕區：隱藏重複的確認答案按鈕，讓「返回遊戲說明」水平置中
+    const submitAnswerBtn = document.getElementById("submitAnswer"); // 假設這是原本下方的大確認按鈕 ID
+    const backBtn = document.getElementById("backToSemBeginning"); // 返回按鈕
+
+    if (submitAnswerBtn) {
+        submitAnswerBtn.style.display = "none"; // 徹底隱藏下方重複的確認按鈕
+    }
+
+    if (backBtn) {
+        backBtn.style.display = "block";
+        backBtn.style.margin = "20px auto 0 auto"; // 讓返回按鈕完美置中
+        backBtn.style.width = "60%";
+        backBtn.style.maxWidth = "280px";
+    }
+
+    let timeLeftForMem = displayDuration;
+    memDisplayTimer = setInterval(() => {
+        timeLeftForMem--;
+        let timerSpan = document.getElementById("countdownTimer");
+        if (timerSpan) {
+            timerSpan.innerText = Math.max(0, timeLeftForMem);
+        }
+
+        if (timeLeftForMem <= 0) {
+            clearInterval(memDisplayTimer);
+            
+            let numPool = document.getElementById("numberPool");
+            if (numPool) {
+                numPool.style.visibility = "hidden"; 
+            }
+
+            keypadButtons.forEach(btn => {
+                btn.disabled = false;
+                btn.style.opacity = "1";
+            });
+        }
+    }, 1000);
+}
+
+// 處理鍵盤點擊邏輯
+function handleKeypadInput(key) {
+    if (key >= "0" && key <= "9") {
+        inputSequence += key;
+    } else if (key === "⌫") {
+        inputSequence = inputSequence.slice(0, -1);
+    } else if (key === "確認") {
+        checkMemAnswer();
+        return; // 檢查完就直接返回
+    }
+
+    // 更新即時輸入顯示
+    let displaySpan = document.getElementById("inputDisplay");
+    if (displaySpan) {
+        displaySpan.innerText = inputSequence || "_";
+    }
+}
+
+// 檢查遊戲二答案
+function checkMemAnswer() {
+    if (!inputSequence) {
+        alert("請先輸入數字！");
+        return;
+    }
+
+    let isCorrect = (inputSequence === targetSequence);
+
+    if (memTryMode) {
+        showFeedback(isCorrect, () => {
+            if (isCorrect) {
+                let goBack = confirm("太棒了！答對囉！要返回遊戲說明頁面嗎？（點擊「取消」則繼續在試玩練習）");
+                if (goBack) {
+                    showScreen(memBeginning);
+                } else {
+                    startMemTrialGame();
+                }
+            } else {
+                startMemTrialGame();
+            }
+        });
+        return;
+    }
+
+    let diff = memCurrentQuestions[memCurrentIndex].difficulty;
+    if (isCorrect) {
+        memScore[diff]++;
+    }
+
+    showFeedback(isCorrect, () => {
+        memCurrentIndex++;
+        loadMemGameStep();
+    });
+}
+
+function endMemGame(message) {
+    let totalSeconds = Math.floor((Date.now() - memStartTime) / 1000);
+    if (memTryMode) totalSeconds = 0;
+
+    let totalScore = memScore.easy + memScore.medium + memScore.hard;
+    
+    finalScoreDetails.innerHTML = `
+        <h3>${message}</h3>
+        <p><b>簡單等級得分：</b> ${memScore.easy} / 5</p>
+        <p><b>中等等級得分：</b> ${memScore.medium} / 5</p>
+        <p><b>困難等級得分：</b> ${memScore.hard} / 5</p>
+        <hr>
+        <p><b>總得分：</b> ${totalScore} 分</p>
+        <p><b>總作答時間：</b> ${memTryMode ? "試玩模式不計時" : totalSeconds + " 秒"}</p>
+    `;
+
+    document.querySelectorAll(".screen").forEach(s => s.classList.add("hidden"));
+    scoreScreen.classList.remove("hidden");
+}
+
+// 修改返回遊戲說明按鈕的行為（讓它能分別對應遊戲一或遊戲二）
+backToSemBeginningBtn.addEventListener("click", () => {
+    clearInterval(timer);
+    clearInterval(memTimer);
+    
+    // 恢復遊戲一的按鈕顯示與原本的大小樣式
+    const confirmBtn = document.getElementById("confirmAnswerBtn");
+    const backBtn = document.getElementById("backToSemBeginningBtn");
+    
+    if (confirmBtn) {
+        confirmBtn.style.display = "inline-block";
+    }
+    if (backBtn) {
+        backBtn.style.width = "";   // 清除遊戲二寫死的寬度
+        backBtn.style.margin = "";  // 清除遊戲二寫死的邊距
+    }
+
+    if (currentQuestions.length > 0 && currentQuestions[0].numbersText === undefined) {
+        showScreen(semBeginning);
+    } else {
+        showScreen(memBeginning);
+    }
 });
