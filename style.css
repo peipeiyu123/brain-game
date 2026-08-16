@@ -147,25 +147,25 @@ input {
     height: 100%;
     justify-content: center;
     align-items: center;
-    z-index: 999;
+    z-index: 99999;
+    background-color: transparent !important; /* 確保沒有任何背景色 */
 }
 
 #feedbackContent {
-    background: transparent;
-    padding: 20px;
+    padding: 0;
+    border-radius: 0;
     text-align: center;
+    background: transparent;
+    box-shadow: none;
 }
 
 #feedbackIcon {
-    font-size: 140px !important;
+    font-size: 120px !important; /* 放大圖示讓它更顯眼 */
     font-weight: bold;
     line-height: 1;
-    margin-bottom: 10px;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.3); /* 加上文字陰影，確保在任何背景圖片上都清晰可見 */
 }
 
 #feedbackText {
-    font-size: 36px !important;
-    font-weight: bold;
-    color: #ffffff;
-    text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+    display: none; /* 不需要額外文字 */
 }

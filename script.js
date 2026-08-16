@@ -29,8 +29,6 @@ const timeLeftSpan = document.getElementById("timeLeft");
 const progressText = document.getElementById("progressText");
 const questionInstruction = document.getElementById("questionInstruction");
 const feedbackOverlay = document.getElementById("feedbackOverlay");
-const feedbackIcon = document.getElementById("feedbackIcon");
-const feedbackText = document.getElementById("feedbackText");
 
 const scoreScreen = document.querySelector(".scoreScreen");
 const finalScoreDetails = document.getElementById("finalScoreDetails");
@@ -81,6 +79,9 @@ let memStartTime = 0;
 let targetSequence = []; // 正確答案字串
 let inputSequence = "";  // 玩家輸入的字串
 let memDisplayTimer = null;
+
+let feedbackIcon = document.getElementById("feedbackIcon");
+let feedbackText = document.getElementById("feedbackText");
 
 function showScreen(screen) {
     document.querySelectorAll(".screen").forEach(s => s.classList.add("hidden"));
@@ -358,12 +359,14 @@ function renderQuestion() {
 function showFeedback(isCorrect, callback) {
     feedbackIcon.innerText = isCorrect ? "✔" : "✖";
     feedbackIcon.style.color = isCorrect ? "#28a745" : "#dc3545";
+    
+    feedbackIcon.style.display = "block";
     feedbackOverlay.style.display = "flex";
 
     setTimeout(() => {
         feedbackOverlay.style.display = "none";
         if (callback) callback();
-    }, 500); // 停留 0.9 秒自動消失
+    }, 500); // 停留 0.5 秒自動消失
 }
 
 confirmAnswerBtn.addEventListener("click", () => {
@@ -802,39 +805,79 @@ backToSemBeginningBtn.addEventListener("click", () => {
 });
 
 function showCustomAlert(message) {
-    let overlay = document.getElementById("feedbackOverlay");
+    const overlay = document.getElementById("feedbackOverlay");
+
     if (!overlay) return;
 
-    // 動態建立大字、大按鈕的自定義彈窗，確保高齡者看得清楚且點得到
     overlay.innerHTML = `
-        <div style="background: #ffffff; padding: 40px; border-radius: 20px; max-width: 85%; width: 500px; margin: auto; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.3); border: 4px solid #007bff;">
-            <div style="font-size: 28px; color: #333333; line-height: 1.6; margin-bottom: 30px; font-weight: bold;">
+        <div style="
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 85%;
+            width: 500px;
+            margin: auto;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 4px solid #007bff;
+        ">
+            <div style="
+                font-size: 28px;
+                color: #333333;
+                line-height: 1.6;
+                margin-bottom: 30px;
+                font-weight: bold;
+            ">
                 ${message}
             </div>
-            <button id="tempAlertBtn" class="button" style="background-color: #007bff; color: white; width: 180px; margin: 0 auto; display: inline-block; cursor: pointer; font-size: 24px !important; padding: 12px 20px; border-radius: 12px; border: none;">
+
+            <button
+                id="tempAlertBtn"
+                class="button"
+                style="
+                    background-color: #007bff;
+                    color: white;
+                    width: 180px;
+                    margin: 0 auto;
+                    display: inline-block;
+                    cursor: pointer;
+                    font-size: 24px !important;
+                    padding: 12px 20px;
+                    border-radius: 12px;
+                    border: none;
+                ">
                 確定
             </button>
         </div>
     `;
 
-    // 顯示遮罩並置於最高層級
     overlay.style.display = "flex";
     overlay.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
     overlay.style.zIndex = "99999";
 
-    // 綁定「確定」按鈕點擊事件，點擊後關閉並還原畫面
-    let btn = document.getElementById("tempAlertBtn");
+    const btn = document.getElementById("tempAlertBtn");
+
     if (btn) {
         btn.onclick = () => {
             overlay.style.display = "none";
-            // 還原原本 feedback 的結構，避免影響後續答對/答錯的判定
+
+            // 重新建立 feedback 結構
             overlay.innerHTML = `
                 <div id="feedbackContent">
                     <div id="feedbackIcon"></div>
                     <div id="feedbackText"></div>
-                    <button class="button" id="customAlertBtn" style="display: none; margin-top: 20px; background-color: #007bff; color: white;">確定</button>
+                    <button
+                        class="button"
+                        id="customAlertBtn"
+                        style="display: none;">
+                        確定
+                    </button>
                 </div>
             `;
+
+            // ★ 重新取得新的 DOM 元素
+            feedbackIcon = document.getElementById("feedbackIcon");
+            feedbackText = document.getElementById("feedbackText");
         };
     }
 }
