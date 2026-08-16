@@ -459,8 +459,18 @@ function setupMemGameLayout() {
 // 產生遊戲二題目
 function generateMemQuestion(diff) {
     let length = 3;
-    if (diff === "medium") length = 4;
-    if (diff === "hard") length = 5;
+    let isBackward = false;
+
+    if (diff === "easy") {
+        length = 3;
+        isBackward = false; // 正背
+    } else if (diff === "medium") {
+        length = 4;
+        isBackward = false; // 正背
+    } else if (diff === "hard") {
+        length = 4; // 如果難度想維持 4 位數或改成 5 位數可以自行調整這裡
+        isBackward = true;  // 逆背
+    }
 
     // 隨機產生指定長度的數字 (0-9)
     let numbers = [];
@@ -468,8 +478,6 @@ function generateMemQuestion(diff) {
         numbers.push(Math.floor(Math.random() * 10));
     }
 
-    // 隨機決定正背 (forward: 依原順序) 或是 逆背 (backward: 反向順序)
-    let isBackward = Math.random() > 0.5;
     let modeText = isBackward ? "逆背（由右到左）" : "正背（由左到右）";
     
     let ansStr = "";
@@ -551,6 +559,7 @@ function renderMemGameScreen() {
 
     let diffTitle = q.difficulty === "easy" ? "簡單等級" : (q.difficulty === "medium" ? "中等等級" : "困難等級");
     
+    // 注意：初始時把作答指示的容器設為 hidden 或不顯示，等時間到再出現
     questionInstruction.innerHTML = `
         <div style="text-align: center; margin-top: 10px;">
             <div style="font-size: 22px; color: #0066cc; margin-bottom: 10px;">
@@ -561,7 +570,8 @@ function renderMemGameScreen() {
                 ${q.numbersText}
             </div>
             
-            <div style="font-size: 24px; color: #333; margin-bottom: 30px;">
+            <!-- 剛開始先隱藏作答指示，等數字消失後再顯示 -->
+            <div id="modeInstruction" style="font-size: 24px; color: #333; margin-bottom: 30px; visibility: hidden;">
                 作答指示：${q.modeText}
             </div>
             
@@ -581,8 +591,8 @@ function renderMemGameScreen() {
 
     // 建立 11 鍵盤 + 右下角「確認」
     let keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "⌫", "0", "確認"];
-
     let keypadButtons = [];
+    
     keys.forEach(key => {
         const btn = document.createElement("button");
         btn.className = "button";
@@ -610,7 +620,6 @@ function renderMemGameScreen() {
         
         btn.disabled = true;
         btn.style.opacity = "0.5";
-
         btn.innerText = key;
 
         btn.addEventListener("click", () => {
@@ -623,19 +632,15 @@ function renderMemGameScreen() {
         keypadButtons.push(btn);
     });
 
-    // 處理下方大型按鈕區：隱藏重複的確認答案按鈕，讓「返回遊戲說明」水平置中
-    const submitAnswerBtn = document.getElementById("submitAnswer"); // 假設這是原本下方的大確認按鈕 ID
-    const backBtn = document.getElementById("backToSemBeginning"); // 返回按鈕
-
-    if (submitAnswerBtn) {
-        submitAnswerBtn.style.display = "none"; // 徹底隱藏下方重複的確認按鈕
-    }
-
+    // 處理遊戲二排版：隱藏確認答案按鈕、讓返回按鈕正常顯示
+    const confirmBtn = document.getElementById("confirmAnswerBtn");
+    const backBtn = document.getElementById("backToSemBeginningBtn");
+    
+    if (confirmBtn) confirmBtn.style.display = "none";
     if (backBtn) {
-        backBtn.style.display = "block";
-        backBtn.style.margin = "20px auto 0 auto"; // 讓返回按鈕完美置中
-        backBtn.style.width = "60%";
-        backBtn.style.maxWidth = "280px";
+        backBtn.style.display = "inline-block";
+        backBtn.style.width = "";
+        backBtn.style.margin = "";
     }
 
     let timeLeftForMem = displayDuration;
@@ -649,11 +654,19 @@ function renderMemGameScreen() {
         if (timeLeftForMem <= 0) {
             clearInterval(memDisplayTimer);
             
+            // 數字消失
             let numPool = document.getElementById("numberPool");
             if (numPool) {
                 numPool.style.visibility = "hidden"; 
             }
 
+            // 顯示作答指示（正背/逆背）並保持在畫面上
+            let modeInst = document.getElementById("modeInstruction");
+            if (modeInst) {
+                modeInst.style.visibility = "visible";
+            }
+
+            // 啟用鍵盤
             keypadButtons.forEach(btn => {
                 btn.disabled = false;
                 btn.style.opacity = "1";
