@@ -537,7 +537,7 @@ function startMemTrialGame() {
 
 function startMemGameSession() {
     clearAllTimers(); // 確保清除所有殘存計時器
-    memTimeLeft = 90; // 若遊戲二需求為 60 秒（若需 90 秒可改為 90）
+    memTimeLeft = 100; // 若遊戲二需求為 60 秒（若需 90 秒可改為 90）
     timeLeftSpan.innerText = memTimeLeft;
 
     timeLeftSpan.parentElement.style.display = "block";
@@ -818,7 +818,7 @@ function endMemGame(message) {
     if (memTryMode) {
         totalSeconds = 0;
     } else {
-        totalSeconds = Math.min(totalSeconds, 90);
+        totalSeconds = Math.min(totalSeconds, 100);
     }
 
     let totalScore = memScore.easy + memScore.medium + memScore.hard;
