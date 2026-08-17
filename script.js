@@ -443,7 +443,7 @@ memMedium.addEventListener("click", () => {
     showCustomAlert("【中等等級說明】<br>隨機出現 4 個數字，依指示正背（由左到右）。");
 });
 memHard.addEventListener("click", () => {
-    showCustomAlert("【難等級說明】<br>隨機出現 4 個數字，依指示逆背（由右到左）。");
+    showCustomAlert("【難等級說明】<br>隨機出現 4 個數字，數字將依序出現，請依指示逆背（倒著背、由後往前背）。");
 });
 
 // 在點擊「試玩」或「開始遊戲」時，隱藏下方確認按鈕並讓返回按鈕置中
@@ -496,7 +496,7 @@ function generateMemQuestion(diff) {
         length = 4;
         isBackward = false; // 正背
     } else if (diff === "hard") {
-        length = 4; // 如果難度想維持 4 位數或改成 5 位數可以自行調整這裡
+        length = 4; // 確保難等級固定為 4 個數字
         isBackward = true;  // 逆背
     }
 
@@ -585,43 +585,46 @@ function renderMemGameScreen() {
         clearInterval(memDisplayTimer);
     }
 
-    let displayDuration = 2;
-    if (q.difficulty === "medium") displayDuration = 3;
-    if (q.difficulty === "hard") displayDuration = 4;
-
     let diffTitle = q.difficulty === "easy" ? "簡單等級" : (q.difficulty === "medium" ? "中等等級" : "困難等級");
     
-    // 注意：初始時把作答指示的容器設為 hidden 或不顯示，等時間到再出現
+    // 依據難度決定是否顯示「幾秒後隱藏數字」的括號提示
+    let timerPromptHTML = "";
+    if (q.difficulty === "hard") {
+        timerPromptHTML = `【${diffTitle}】 請記憶以下數字：`;
+    } else {
+        let defaultSec = (q.difficulty === "medium") ? 3 : 2;
+        timerPromptHTML = `【${diffTitle}】 請記憶以下數字（ <span id="countdownTimer" style="color: #d9534f; font-weight: bold;">${defaultSec}</span> 秒後隱藏數字 ）：`;
+    }
+
     questionInstruction.innerHTML = `
         <div style="text-align: center; margin-top: 10px;">
             <div style="font-size: 22px; color: #0066cc; margin-bottom: 10px;">
-                【${diffTitle}】 請記憶以下數字（ <span id="countdownTimer" style="color: #d9534f; font-weight: bold;">${displayDuration}</span> 秒後隱藏數字 ）：
+                ${timerPromptHTML}
             </div>
             
-            <div id="numberPool" style="font-size: 48px; color: #d9534f; letter-spacing: 15px; margin: 15px 0; height: 60px; display: flex; justify-content: center; align-items: center; visibility: visible;">
-                ${q.numbersText}
+            <div id="numberPool" style="font-size: 60px; color: #d9534f; margin: 15px 0; height: 70px; display: flex; justify-content: center; align-items: center;">
+                準備開始
             </div>
             
-            <!-- 剛開始先隱藏作答指示，等數字消失後再顯示 -->
-            <div id="modeInstruction" style="font-size: 24px; color: #333; margin-bottom: 30px; visibility: hidden;">
+            <div id="modeInstruction" style="font-size: 24px; color: #333; margin-bottom: 20px; visibility: hidden;">
                 作答指示：${q.modeText}
             </div>
             
-            <div style="font-size: 26px; color: #007bff; margin-bottom: 25px;">
-                您的輸入： <span id="inputDisplay" style="color: #007bff; border-bottom: 2px solid #007bff; padding: 0 15px; display: inline-block; min-width: 60px; text-align: center; height: 35px;">${inputSequence || ""}</span>
+            <div style="font-size: 24px; color: #007bff; margin-bottom: 15px;">
+                您的輸入： <span id="inputDisplay" style="color: #007bff; border-bottom: 2px solid #007bff; padding: 0 15px; display: inline-block; min-width: 60px; text-align: center; height: 32px;">${inputSequence || "_"}</span>
             </div>
         </div>
     `;
 
+    // 建立 11 鍵盤 + 右下角「確認」
     buttons.className = "buttons mem-keypad";
     buttons.style.display = "grid";
     buttons.style.gridTemplateColumns = "repeat(3, 1fr)";
-    buttons.style.gap = "15px";
+    buttons.style.gap = "12px";
     buttons.style.maxWidth = "320px";
     buttons.style.margin = "0 auto";
     buttons.innerHTML = "";
 
-    // 建立 11 鍵盤 + 右下角「確認」
     let keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "⌫", "0", "確認"];
     let keypadButtons = [];
     
@@ -629,9 +632,9 @@ function renderMemGameScreen() {
         const btn = document.createElement("button");
         btn.className = "button";
         btn.style.width = "100%";
-        btn.style.height = "75px";
+        btn.style.height = "60px";
         btn.style.margin = "0";
-        btn.style.fontSize = key === "確認" ? "22px" : "28px";
+        btn.style.fontSize = key === "確認" ? "20px" : "24px";
         btn.style.fontWeight = "bold";
         
         if (key === "確認") {
@@ -643,8 +646,8 @@ function renderMemGameScreen() {
         }
 
         btn.style.border = "none";
-        btn.style.borderRadius = "15px";
-        btn.style.boxShadow = "0 4px 6px rgba(0,0,0,0.1)";
+        btn.style.borderRadius = "12px";
+        btn.style.boxShadow = "0 3px 5px rgba(0,0,0,0.1)";
         btn.style.display = "flex";
         btn.style.justifyContent = "center";
         btn.style.alignItems = "center";
@@ -664,7 +667,6 @@ function renderMemGameScreen() {
         keypadButtons.push(btn);
     });
 
-    // 處理遊戲二排版：隱藏確認答案按鈕、讓返回按鈕正常顯示
     const confirmBtn = document.getElementById("confirmAnswerBtn");
     const backBtn = document.getElementById("backToSemBeginningBtn");
     
@@ -675,36 +677,85 @@ function renderMemGameScreen() {
         backBtn.style.margin = "";
     }
 
-    let timeLeftForMem = displayDuration;
-    memDisplayTimer = setInterval(() => {
-        timeLeftForMem--;
-        let timerSpan = document.getElementById("countdownTimer");
-        if (timerSpan) {
-            timerSpan.innerText = Math.max(0, timeLeftForMem);
+    let numPool = document.getElementById("numberPool");
+    let timerSpan = document.getElementById("countdownTimer");
+    let modeInst = document.getElementById("modeInstruction");
+
+    if (q.difficulty === "hard") {
+        // === 難等級：數字一個一個依序出現，並加入短暫空白防重複數字卡住 ===
+        let numberArray = q.numbersText.split(" ").filter(n => n !== "");
+        let stepInterval = 1.0; // 每個數字顯示 1.0 秒
+        
+        let i = 0;
+        numPool.innerText = "";
+
+        function showNextNumber() {
+            if (i < numberArray.length) {
+                numPool.innerText = "";
+                let currentNum = numberArray[i];
+                i++;
+
+                let showTimeout = setTimeout(() => {
+                    numPool.innerText = currentNum;
+
+                    let hideTimeout = setTimeout(() => {
+                        showNextNumber();
+                    }, (stepInterval - 0.08) * 1000);
+
+                    memDisplayTimer = hideTimeout;
+                }, 80);
+
+                memDisplayTimer = showTimeout;
+
+            } else {
+                // 全部數字播完後的收尾
+                numPool.innerText = "";
+                numPool.style.visibility = "hidden";
+                if (modeInst) modeInst.style.visibility = "visible";
+
+                keypadButtons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.style.opacity = "1";
+                });
+            }
         }
 
-        if (timeLeftForMem <= 0) {
-            clearInterval(memDisplayTimer);
-            
-            // 數字消失
-            let numPool = document.getElementById("numberPool");
-            if (numPool) {
-                numPool.style.visibility = "hidden"; 
-            }
+        showNextNumber();
+    } else {
+        // === 易、中等級：維持整串一次顯示與倒數 ===
+        let displayDuration = (q.difficulty === "medium") ? 3 : 2;
+        numPool.innerText = q.numbersText;
 
-            // 顯示作答指示（正背/逆背）並保持在畫面上
-            let modeInst = document.getElementById("modeInstruction");
-            if (modeInst) {
-                modeInst.style.visibility = "visible";
-            }
+        let timeLeftForMem = displayDuration;
+        memDisplayTimer = setInterval(() => {
+            timeLeftForMem--;
+            if (timerSpan) timerSpan.innerText = Math.max(0, timeLeftForMem);
 
-            // 啟用鍵盤
-            keypadButtons.forEach(btn => {
-                btn.disabled = false;
-                btn.style.opacity = "1";
-            });
-        }
-    }, 1000);
+            if (timeLeftForMem <= 0) {
+                clearInterval(memDisplayTimer);
+                
+                if (numPool) numPool.style.visibility = "hidden"; 
+                if (modeInst) modeInst.style.visibility = "visible";
+
+                keypadButtons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.style.opacity = "1";
+                });
+            }
+        }, 1000);
+    }
+}
+
+function finishDisplaySequence() {
+    let modeInst = document.getElementById("modeInstruction");
+    if (modeInst) modeInst.style.visibility = "visible";
+
+    // 啟用所有鍵盤按鈕
+    const keypadBtns = buttons.querySelectorAll(".button");
+    keypadBtns.forEach(btn => {
+        btn.disabled = false;
+        btn.style.opacity = "1";
+    });
 }
 
 // 處理鍵盤點擊邏輯
@@ -762,8 +813,13 @@ function checkMemAnswer() {
 }
 
 function endMemGame(message) {
+    // 限制總秒數最多就是 90 秒（時間到結束時不會超過 90）
     let totalSeconds = Math.floor((Date.now() - memStartTime) / 1000);
-    if (memTryMode) totalSeconds = 0;
+    if (memTryMode) {
+        totalSeconds = 0;
+    } else {
+        totalSeconds = Math.min(totalSeconds, 90);
+    }
 
     let totalScore = memScore.easy + memScore.medium + memScore.hard;
     
